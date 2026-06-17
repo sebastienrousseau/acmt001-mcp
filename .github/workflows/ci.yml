@@ -26,13 +26,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # acmt001-mcp depends on the core `acmt001` library, which is not yet
-      # published to PyPI. Install it from its GitHub repository first, then
-      # install this package (and its test deps) on top.
-      - name: Install core acmt001 (from GitHub) + this package
+      # Installs this package; its core `acmt001` dependency resolves from PyPI.
+      - name: Install this package (+ acmt001 from PyPI)
         run: |
           python -m pip install --upgrade pip
-          pip install "git+https://github.com/sebastienrousseau/acmt001.git@main"
           pip install .
           pip install pytest
 
@@ -51,11 +48,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Install core acmt001 from GitHub so mypy can resolve `acmt001.services`.
-      - name: Install core acmt001 (from GitHub) + this package
+      # Install this package (acmt001 resolves from PyPI) so mypy can resolve
+      # `acmt001.services`.
+      - name: Install this package (+ acmt001 from PyPI)
         run: |
           python -m pip install --upgrade pip
-          pip install "git+https://github.com/sebastienrousseau/acmt001.git@main"
           pip install .
           pip install ruff black mypy
 
