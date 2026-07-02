@@ -212,6 +212,12 @@ make lint         # ruff + black
 make type-check   # mypy --strict
 ```
 
+## MCP Registry
+
+`mcp-name: io.github.sebastienrousseau/acmt001-mcp`
+
+---
+
 ## Licence
 
 Licensed under the [Apache Licence, Version 2.0][01]. Any contribution submitted
