@@ -9,7 +9,7 @@ on:
       tag:
         description: "Release tag to publish"
         required: true
-        default: "v0.0.1"
+        default: "v0.0.2"
 
 permissions:
   contents: write   # create/update the GitHub Release

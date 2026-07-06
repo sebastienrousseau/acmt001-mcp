@@ -15,9 +15,9 @@ ISO 20022 Account Management library as tools for AI agents and assistants** —
 discover message types, inspect input schemas, validate records and financial
 identifiers, and generate validated XML, all from your favourite MCP client.
 
-> **Latest release: v0.0.1** — six MCP tools over stdio, all backed by the
+> **Latest release: v0.0.2** — six MCP tools over stdio, all backed by the
 > shared `acmt001.services` layer, for Python 3.10+.
-> [See what's new →][release-001]
+> [See what's new →][release-002]
 
 ## Contents
 
@@ -212,6 +212,25 @@ make lint         # ruff + black
 make type-check   # mypy --strict
 ```
 
+## Related MCP Servers
+
+Part of the **ISO 20022 MCP Suite** — open-source, Apache-2.0 licensed MCP servers for banking and financial-services AI agents:
+
+| Server | Purpose |
+|---|---|
+| [`pain001-mcp`](https://github.com/sebastienrousseau/pain001-mcp) | Generate & validate ISO 20022 pain.001 payment initiation files (Customer Credit Transfer) |
+| [`bankstatementparser-mcp`](https://github.com/sebastienrousseau/bankstatementparser-mcp) | Parse bank statements (BAI2, MT940/MT942, CAMT.053, OFX, CSV) into structured transactions |
+| [`camt053-mcp`](https://github.com/sebastienrousseau/camt053-mcp) | Parse & reconcile ISO 20022 camt.053 bank-to-customer statements — CBPR+/HVPS+ ready |
+| [`noyalib-mcp`](https://github.com/sebastienrousseau/noyalib) | Lossless YAML 1.2 parsing, formatting & validation (Rust, 100% spec compliance) |
+
+---
+
+## MCP Registry
+
+`mcp-name: io.github.sebastienrousseau/acmt001-mcp`
+
+---
+
 ## Licence
 
 Licensed under the [Apache Licence, Version 2.0][01]. Any contribution submitted
@@ -234,6 +253,7 @@ Built on the [`acmt001`][core] ISO 20022 Account Management library and the
 [core]: https://github.com/sebastienrousseau/acmt001
 [lsp]: https://github.com/sebastienrousseau/acmt001-lsp
 [mcp]: https://modelcontextprotocol.io
+[release-002]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.2
 [release-001]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.1
 [banner]: https://kura.pro/acmt001-mcp/images/banners/banner-acmt001-mcp.svg 'acmt001-mcp'
 [docs-badge]: https://img.shields.io/badge/Docs-acmt001.com-blue?style=for-the-badge

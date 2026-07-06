@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.sebastienrousseau/acmt001-mcp",
+  "description": "MCP server for ISO 20022 acmt.001 account management message generation and validation, exposing account opening and maintenance tools to AI agents.",
+  "repository": {
+    "url": "https://github.com/sebastienrousseau/acmt001-mcp",
+    "source": "github"
+  },
+  "version": "0.0.2",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "acmt001-mcp",
+      "version": "0.0.2",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
