@@ -117,7 +117,7 @@ def test_call_tool_through_fastmcp(sample_record):
             "validate_identifier", {"kind": "bic", "value": "NWBKGB2LXXX"}
         )
         # call_tool returns a sequence of content blocks; extract the text.
-        block = result[0] if isinstance(result, (list, tuple)) else result
+        block = result[0] if isinstance(result, list | tuple) else result
         text = getattr(block, "text", None)
         if text is None and isinstance(result, tuple):
             # Newer FastMCP returns (content, structured) tuples.

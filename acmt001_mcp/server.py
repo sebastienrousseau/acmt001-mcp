@@ -53,13 +53,43 @@ import json
 
 from acmt001 import services
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
+
+from acmt001_mcp import __version__
 
 server = FastMCP("acmt001")
+# FastMCP does not expose a version kwarg; without this override the
+# MCP SDK's own version leaks into serverInfo.version, breaking
+# manifest/runtime coherence checks (e.g. Glama scoring).
+server._mcp_server.version = __version__
+
+# Shared MCP tool annotations. Every tool in this server is a pure,
+# side-effect-free reader over the acmt001 ``services`` facade: each tool
+# computes solely from its arguments and the JSON Schemas / XSD templates
+# bundled with the acmt001 library. None opens a caller-supplied filesystem
+# path or reaches an external system, so all are marked ``readOnlyHint`` +
+# ``idempotentHint``, never ``destructiveHint``, and closed-world
+# (``openWorldHint=False``).
+#
+# These hints let MCP clients (and the Glama quality grader) reason about
+# safety, caching, and auto-approval without executing the tool.
+_PURE_READ = ToolAnnotations(
+    readOnlyHint=True,
+    destructiveHint=False,
+    idempotentHint=True,
+    openWorldHint=False,
+)
 
 
-@server.tool()
+@server.tool(title="List acmt message types", annotations=_PURE_READ)
 def list_message_types() -> list[dict]:
-    """List every supported ISO 20022 acmt message type.
+    """List every supported ISO 20022 acmt message type and its human name.
+
+    Use this first, before any generation or validation call, to discover the
+    exact ``message_type`` strings this server accepts (e.g.
+    ``acmt.001.001.08`` Account Opening Instruction). Do not use it to fetch a
+    type's fields or schema -- call ``get_required_fields`` or
+    ``get_input_schema`` for that.
 
     Returns a list of ``{"message_type": ..., "name": ...}`` dictionaries, one
     per supported message type (e.g. ``acmt.001.001.08``).
@@ -70,9 +100,13 @@ def list_message_types() -> list[dict]:
         return [{"error": str(exc)}]
 
 
-@server.tool()
+@server.tool(title="Get required fields", annotations=_PURE_READ)
 def get_required_fields(message_type: str) -> list[str]:
-    """List the required input field names for a given acmt message type.
+    """List only the required input field names for an acmt message type.
+
+    Use this for a quick checklist of the mandatory columns before building
+    account records. When you need full type/format constraints (not just
+    which fields are required), call ``get_input_schema`` instead.
 
     Args:
         message_type: A supported ISO 20022 acmt message type.
@@ -83,9 +117,14 @@ def get_required_fields(message_type: str) -> list[str]:
         return [f"error: {exc}"]
 
 
-@server.tool()
+@server.tool(title="Get input JSON Schema", annotations=_PURE_READ)
 def get_input_schema(message_type: str) -> dict:
-    """Return the JSON Schema describing the flat input record for a type.
+    """Return the full JSON Schema for a message type's flat input record.
+
+    Use this to learn every field, its type, and its constraints before
+    assembling records, or to drive a form/UI. For just the required-field
+    names use ``get_required_fields``; to actually check records against this
+    schema use ``validate_records``.
 
     Args:
         message_type: A supported ISO 20022 acmt message type.
@@ -96,9 +135,14 @@ def get_input_schema(message_type: str) -> dict:
         return {"error": str(exc)}
 
 
-@server.tool()
+@server.tool(title="Validate records against schema", annotations=_PURE_READ)
 def validate_records(message_type: str, records: list[dict]) -> dict:
-    """Validate flat records against a message type's input JSON Schema.
+    """Validate flat account records against a message type's input JSON Schema.
+
+    Use this before ``generate_message`` to catch structural/type errors per
+    record and get a row-by-row error report. This checks JSON-Schema shape
+    only; to validate a single financial identifier in isolation use
+    ``validate_identifier``.
 
     Returns a report ``{"valid": bool, "total": int, "valid_count": int,
     "errors": [...]}``.
@@ -113,9 +157,13 @@ def validate_records(message_type: str, records: list[dict]) -> dict:
         return {"error": str(exc)}
 
 
-@server.tool()
+@server.tool(title="Validate IBAN, BIC or LEI", annotations=_PURE_READ)
 def validate_identifier(kind: str, value: str) -> dict:
-    """Validate a financial identifier (IBAN, BIC, or LEI).
+    """Validate a single financial identifier (IBAN, BIC, or LEI).
+
+    Use this for a one-off identifier check with a clear pass/fail. To
+    validate identifiers embedded across a whole batch of account records,
+    prefer ``validate_records`` rather than calling this per field.
 
     Returns ``{"kind": str, "value": str, "valid": bool}``.
 
@@ -129,9 +177,14 @@ def validate_identifier(kind: str, value: str) -> dict:
         return {"error": str(exc)}
 
 
-@server.tool()
+@server.tool(title="Generate acmt XML from records", annotations=_PURE_READ)
 def generate_message(message_type: str, records: list[dict]) -> str:
-    """Generate a validated ISO 20022 acmt XML message from flat records.
+    """Generate a validated ISO 20022 acmt XML message from in-memory records.
+
+    This is the primary generation tool: pass account records you already
+    hold in memory and receive an XSD-validated XML document; no file is
+    written. Run ``validate_records`` first to surface record-level errors,
+    and ``list_message_types`` to confirm the ``message_type`` string.
 
     Returns the validated XML document as a string, or an ``{"error": ...}``
     payload (serialized) if generation fails.
