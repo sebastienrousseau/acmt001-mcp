@@ -50,10 +50,12 @@ The server communicates over stdio (FastMCP's default transport).
 """
 
 import json
+from typing import Annotated
 
 from acmt001 import services
 from mcp.server.fastmcp import FastMCP
 from mcp.types import ToolAnnotations
+from pydantic import Field
 
 from acmt001_mcp import __version__
 
@@ -101,7 +103,18 @@ def list_message_types() -> list[dict]:
 
 
 @server.tool(title="Get required fields", annotations=_PURE_READ)
-def get_required_fields(message_type: str) -> list[str]:
+def get_required_fields(
+    message_type: Annotated[
+        str,
+        Field(
+            description=(
+                "A supported ISO 20022 acmt message type, e.g. "
+                "'acmt.001.001.08' Account Opening Instruction -- call "
+                "list_message_types for the exact accepted strings."
+            )
+        ),
+    ],
+) -> list[str]:
     """List only the required input field names for an acmt message type.
 
     Use this for a quick checklist of the mandatory columns before building
@@ -118,7 +131,18 @@ def get_required_fields(message_type: str) -> list[str]:
 
 
 @server.tool(title="Get input JSON Schema", annotations=_PURE_READ)
-def get_input_schema(message_type: str) -> dict:
+def get_input_schema(
+    message_type: Annotated[
+        str,
+        Field(
+            description=(
+                "A supported ISO 20022 acmt message type, e.g. "
+                "'acmt.001.001.08' Account Opening Instruction -- call "
+                "list_message_types for the exact accepted strings."
+            )
+        ),
+    ],
+) -> dict:
     """Return the full JSON Schema for a message type's flat input record.
 
     Use this to learn every field, its type, and its constraints before
@@ -136,7 +160,28 @@ def get_input_schema(message_type: str) -> dict:
 
 
 @server.tool(title="Validate records against schema", annotations=_PURE_READ)
-def validate_records(message_type: str, records: list[dict]) -> dict:
+def validate_records(
+    message_type: Annotated[
+        str,
+        Field(
+            description=(
+                "A supported ISO 20022 acmt message type, e.g. "
+                "'acmt.001.001.08' Account Opening Instruction -- call "
+                "list_message_types for the exact accepted strings."
+            )
+        ),
+    ],
+    records: Annotated[
+        list[dict],
+        Field(
+            description=(
+                "One or more flat account records, each a dict of field name "
+                "-> value; validated against the message type's input JSON "
+                "Schema (see get_input_schema / get_required_fields)."
+            )
+        ),
+    ],
+) -> dict:
     """Validate flat account records against a message type's input JSON Schema.
 
     Use this before ``generate_message`` to catch structural/type errors per
@@ -158,7 +203,26 @@ def validate_records(message_type: str, records: list[dict]) -> dict:
 
 
 @server.tool(title="Validate IBAN, BIC or LEI", annotations=_PURE_READ)
-def validate_identifier(kind: str, value: str) -> dict:
+def validate_identifier(
+    kind: Annotated[
+        str,
+        Field(
+            description=(
+                "The identifier scheme to validate against: one of 'iban', "
+                "'bic', or 'lei' (case-insensitive)."
+            )
+        ),
+    ],
+    value: Annotated[
+        str,
+        Field(
+            description=(
+                "The identifier value to check, e.g. an IBAN, BIC/SWIFT code, "
+                "or LEI; validated according to the given kind."
+            )
+        ),
+    ],
+) -> dict:
     """Validate a single financial identifier (IBAN, BIC, or LEI).
 
     Use this for a one-off identifier check with a clear pass/fail. To
@@ -178,7 +242,28 @@ def validate_identifier(kind: str, value: str) -> dict:
 
 
 @server.tool(title="Generate acmt XML from records", annotations=_PURE_READ)
-def generate_message(message_type: str, records: list[dict]) -> str:
+def generate_message(
+    message_type: Annotated[
+        str,
+        Field(
+            description=(
+                "A supported ISO 20022 acmt message type, e.g. "
+                "'acmt.001.001.08' Account Opening Instruction -- call "
+                "list_message_types for the exact accepted strings."
+            )
+        ),
+    ],
+    records: Annotated[
+        list[dict],
+        Field(
+            description=(
+                "One or more flat account records, each a dict of field name "
+                "-> value, from which the acmt XML is generated; run "
+                "validate_records first to surface record-level errors."
+            )
+        ),
+    ],
+) -> str:
     """Generate a validated ISO 20022 acmt XML message from in-memory records.
 
     This is the primary generation tool: pass account records you already
