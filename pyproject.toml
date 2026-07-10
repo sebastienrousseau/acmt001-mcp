@@ -40,7 +40,29 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
-addopts = ["-ra", "--strict-markers", "--tb=short"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--tb=short",
+    "--cov=acmt001_mcp",
+    "--cov-branch",
+    "--cov-report=term-missing",
+    "--cov-fail-under=100",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["acmt001_mcp"]
+
+[tool.coverage.report]
+exclude_also = [
+    "if __name__ == .__main__.:",
+    "pragma: no cover",
+    "@overload",
+]
+fail_under = 100
+show_missing = true
+skip_covered = false
 
 [tool.ruff]
 line-length = 79

@@ -109,6 +109,54 @@ def test_generate_message_error_is_serializable():
     assert "error" in payload
 
 
+def test_validate_records_valid_report(sample_record):
+    """A well-formed record validates cleanly with a full report shape."""
+    report = server.validate_records("acmt.007.001.05", [sample_record])
+    assert isinstance(report, dict)
+    assert report["valid"] is True
+    assert report["total"] == 1
+    assert report["valid_count"] == 1
+    assert report["errors"] == []
+
+
+def test_validate_records_reports_errors(sample_record):
+    """A record missing a required field is reported as invalid, not raised."""
+    incomplete = dict(sample_record)
+    incomplete.pop("account_id", None)
+    report = server.validate_records("acmt.007.001.05", [incomplete])
+    assert report["valid"] is False
+    assert report["valid_count"] < report["total"]
+    assert report["errors"]
+
+
+def test_validate_records_invalid_message_type_returns_error_dict():
+    """An unsupported message type returns an ``{"error": ...}`` dict."""
+    result = server.validate_records("acmt.999.999.99", [{}])
+    assert isinstance(result, dict)
+    assert "error" in result
+
+
+def test_list_message_types_value_error_returns_error_list(monkeypatch):
+    """A ValueError from the service surfaces as an ``[{"error": ...}]`` list."""
+
+    def boom():
+        raise ValueError("catalogue unavailable")
+
+    monkeypatch.setattr(
+        server.services, "list_message_types", boom
+    )
+    result = server.list_message_types()
+    assert result == [{"error": "catalogue unavailable"}]
+
+
+def test_main_runs_the_server(monkeypatch):
+    """``main`` delegates to the FastMCP server's ``run`` over stdio."""
+    calls = []
+    monkeypatch.setattr(server.server, "run", lambda: calls.append(True))
+    server.main()
+    assert calls == [True]
+
+
 def test_call_tool_through_fastmcp(sample_record):
     """Tools are invocable through the FastMCP dispatch layer."""
 
