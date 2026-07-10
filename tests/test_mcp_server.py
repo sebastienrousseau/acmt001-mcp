@@ -142,9 +142,7 @@ def test_list_message_types_value_error_returns_error_list(monkeypatch):
     def boom():
         raise ValueError("catalogue unavailable")
 
-    monkeypatch.setattr(
-        server.services, "list_message_types", boom
-    )
+    monkeypatch.setattr(server.services, "list_message_types", boom)
     result = server.list_message_types()
     assert result == [{"error": "catalogue unavailable"}]
 
