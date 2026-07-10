@@ -53,6 +53,7 @@ import json
 from typing import Annotated
 
 from acmt001 import services
+from acmt001.constants import valid_xml_types
 from mcp.server.fastmcp import FastMCP
 from mcp.types import ToolAnnotations
 from pydantic import Field
@@ -82,6 +83,45 @@ _PURE_READ = ToolAnnotations(
     openWorldHint=False,
 )
 
+# ---------------------------------------------------------------------------
+# Closed-set parameter enums.
+#
+# Every value below is derived from the acmt001 library's own source-of-truth
+# constants (never hardcoded here), so the accepted set stays in lockstep with
+# the backend. The ``enum`` is JSON Schema metadata only -- it lets MCP clients
+# constrain/auto-complete inputs -- while the ``services`` facade continues to
+# enforce these values at runtime.
+# ---------------------------------------------------------------------------
+_MESSAGE_TYPE_VALUES: list[str] = sorted(valid_xml_types)
+_MESSAGE_TYPE_LIST = ", ".join(f"'{v}'" for v in _MESSAGE_TYPE_VALUES)
+
+_MessageType = Annotated[
+    str,
+    Field(
+        description=(
+            "A supported ISO 20022 acmt message type, e.g. 'acmt.001.001.08' "
+            "Account Opening Instruction. Must be exactly one of: "
+            f"{_MESSAGE_TYPE_LIST} (see list_message_types)."
+        ),
+        json_schema_extra={"enum": _MESSAGE_TYPE_VALUES},
+    ),
+]
+
+_IDENTIFIER_KIND_VALUES: list[str] = sorted(services._IDENTIFIER_VALIDATORS)
+_IDENTIFIER_KIND_LIST = ", ".join(f"'{v}'" for v in _IDENTIFIER_KIND_VALUES)
+
+_IdentifierKind = Annotated[
+    str,
+    Field(
+        description=(
+            "The financial identifier scheme to validate against "
+            "(case-insensitive). Must be exactly one of: "
+            f"{_IDENTIFIER_KIND_LIST}."
+        ),
+        json_schema_extra={"enum": _IDENTIFIER_KIND_VALUES},
+    ),
+]
+
 
 @server.tool(title="List acmt message types", annotations=_PURE_READ)
 def list_message_types() -> list[dict]:
@@ -104,16 +144,7 @@ def list_message_types() -> list[dict]:
 
 @server.tool(title="Get required fields", annotations=_PURE_READ)
 def get_required_fields(
-    message_type: Annotated[
-        str,
-        Field(
-            description=(
-                "A supported ISO 20022 acmt message type, e.g. "
-                "'acmt.001.001.08' Account Opening Instruction -- call "
-                "list_message_types for the exact accepted strings."
-            )
-        ),
-    ],
+    message_type: _MessageType,
 ) -> list[str]:
     """List only the required input field names for an acmt message type.
 
@@ -132,16 +163,7 @@ def get_required_fields(
 
 @server.tool(title="Get input JSON Schema", annotations=_PURE_READ)
 def get_input_schema(
-    message_type: Annotated[
-        str,
-        Field(
-            description=(
-                "A supported ISO 20022 acmt message type, e.g. "
-                "'acmt.001.001.08' Account Opening Instruction -- call "
-                "list_message_types for the exact accepted strings."
-            )
-        ),
-    ],
+    message_type: _MessageType,
 ) -> dict:
     """Return the full JSON Schema for a message type's flat input record.
 
@@ -161,16 +183,7 @@ def get_input_schema(
 
 @server.tool(title="Validate records against schema", annotations=_PURE_READ)
 def validate_records(
-    message_type: Annotated[
-        str,
-        Field(
-            description=(
-                "A supported ISO 20022 acmt message type, e.g. "
-                "'acmt.001.001.08' Account Opening Instruction -- call "
-                "list_message_types for the exact accepted strings."
-            )
-        ),
-    ],
+    message_type: _MessageType,
     records: Annotated[
         list[dict],
         Field(
@@ -204,15 +217,7 @@ def validate_records(
 
 @server.tool(title="Validate IBAN, BIC or LEI", annotations=_PURE_READ)
 def validate_identifier(
-    kind: Annotated[
-        str,
-        Field(
-            description=(
-                "The identifier scheme to validate against: one of 'iban', "
-                "'bic', or 'lei' (case-insensitive)."
-            )
-        ),
-    ],
+    kind: _IdentifierKind,
     value: Annotated[
         str,
         Field(
@@ -243,16 +248,7 @@ def validate_identifier(
 
 @server.tool(title="Generate acmt XML from records", annotations=_PURE_READ)
 def generate_message(
-    message_type: Annotated[
-        str,
-        Field(
-            description=(
-                "A supported ISO 20022 acmt message type, e.g. "
-                "'acmt.001.001.08' Account Opening Instruction -- call "
-                "list_message_types for the exact accepted strings."
-            )
-        ),
-    ],
+    message_type: _MessageType,
     records: Annotated[
         list[dict],
         Field(
