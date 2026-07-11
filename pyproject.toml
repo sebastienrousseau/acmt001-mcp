@@ -16,7 +16,7 @@ acmt001-mcp = "acmt001_mcp.server:main"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-acmt001 = ">=0.0.1"
+acmt001 = ">=0.0.2"
 mcp = ">=1.2"
 
 [tool.poetry.group.dev.dependencies]
