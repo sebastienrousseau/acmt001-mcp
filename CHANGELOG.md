@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5] - 2026-07-11
+
+The **quality & hardening** cut. Bundles the tooling/discoverability work
+landed since 0.0.2 into a release, adds value-constraint enums and full test
+coverage, and clears the dev-tooling security advisory. No breaking changes
+to the six tools or their return shapes.
+
+### Added
+
+- **Value-constraint enums** on closed-set tool parameters (`message_type`,
+  identifier `kind`), surfaced as JSON Schema `enum` metadata derived from the
+  `acmt001` library's own constants so accepted values never drift.
+- **Input-schema parameter descriptions** and MCP tool annotations
+  (`readOnlyHint`/`idempotentHint`/…), tool titles, and usage guidance for
+  richer client/Glama introspection.
+- **`glama.json`** and a **`Dockerfile`** so Glama can build and score a
+  release.
+- Regression test asserting the `enum` metadata is emitted in each tool's
+  input schema.
+
+### Changed
+
+- **100% statement + branch test coverage**, enforced inline via
+  `--cov-fail-under=100`; CI installs the package editable so coverage data is
+  collected.
+- Corrected the module docstring's programmatic-import example to
+  `acmt001_mcp.server`.
+
+### Security
+
+- Dev dependency **black** bumped to `^26.3.1` (arbitrary-file-write advisory
+  in the cache-file path). The cryptography / pyarrow / pygments advisories
+  are resolved upstream by `acmt001` >= 0.0.2.
+
 ## [0.0.2] - 2026-07-02
 
 The **discoverability** cut. Registers `acmt001-mcp` with the official
@@ -75,5 +109,6 @@ or API changes.
 - Python 3.10+ support; depends on `acmt001` (>=0.0.1) and `mcp` (>=1.2)
 - Runnable example (`examples/mcp_tools.py`) invoking the tools in-process
 
+[0.0.5]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.5
 [0.0.2]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.2
 [0.0.1]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.1

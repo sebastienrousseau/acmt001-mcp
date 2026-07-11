@@ -4,7 +4,7 @@
   "title": "acmt001-mcp",
   "display_name": "Acmt001 MCP",
   "description": "Model Context Protocol server for the acmt001 ISO 20022 Account Management library. Exposes tools for generating and validating acmt.001 account opening/maintenance instruction messages, IBAN/BIC identifier validation, and XSD-based XML validation. Part of the ISO 20022 MCP Suite.",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "repository": "https://github.com/sebastienrousseau/acmt001-mcp",
   "homepage": "https://acmt001.com",
   "license": "Apache-2.0",

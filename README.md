@@ -15,9 +15,9 @@ ISO 20022 Account Management library as tools for AI agents and assistants** —
 discover message types, inspect input schemas, validate records and financial
 identifiers, and generate validated XML, all from your favourite MCP client.
 
-> **Latest release: v0.0.2** — six MCP tools over stdio, all backed by the
+> **Latest release: v0.0.5** — six MCP tools over stdio, all backed by the
 > shared `acmt001.services` layer, for Python 3.10+.
-> [See what's new →][release-002]
+> [See what's new →][release-005]
 
 ## Contents
 
@@ -253,6 +253,7 @@ Built on the [`acmt001`][core] ISO 20022 Account Management library and the
 [core]: https://github.com/sebastienrousseau/acmt001
 [lsp]: https://github.com/sebastienrousseau/acmt001-lsp
 [mcp]: https://modelcontextprotocol.io
+[release-005]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.5
 [release-002]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.2
 [release-001]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.1
 [banner]: https://kura.pro/acmt001-mcp/images/banners/banner-acmt001-mcp.svg 'acmt001-mcp'
