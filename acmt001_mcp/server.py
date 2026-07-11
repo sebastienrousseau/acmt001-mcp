@@ -33,7 +33,7 @@ Launching the server:
 
     * Programmatically::
 
-        from acmt001.mcp.server import main
+        from acmt001_mcp.server import main
         main()
 
     * In an MCP client config (e.g. Claude Desktop ``claude_desktop_config.json``)::

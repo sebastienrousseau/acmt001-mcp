@@ -49,6 +49,27 @@ def _registered_tool_names() -> set[str]:
     return {tool.name for tool in tools}
 
 
+def _tool_input_schema(name: str) -> dict:
+    """Return the JSON input schema a client sees for the named tool."""
+    for tool in asyncio.run(server.server.list_tools()):
+        if tool.name == name:
+            return tool.inputSchema
+    raise AssertionError(f"tool not registered: {name}")
+
+
+def test_message_type_param_exposes_enum():
+    """Closed-set message_type surfaces its 34 values as JSON-Schema enum."""
+    prop = _tool_input_schema("get_input_schema")["properties"]["message_type"]
+    assert prop["enum"] == server._MESSAGE_TYPE_VALUES
+    assert len(prop["enum"]) == 34
+
+
+def test_identifier_kind_param_exposes_enum():
+    """Closed-set identifier kind surfaces iban/bic/lei as JSON-Schema enum."""
+    prop = _tool_input_schema("validate_identifier")["properties"]["kind"]
+    assert set(prop["enum"]) == {"iban", "bic", "lei"}
+
+
 def test_server_and_main_are_well_formed():
     """The module exposes a FastMCP server and a callable ``main``."""
     assert isinstance(server.server, FastMCP)

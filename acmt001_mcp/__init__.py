@@ -15,4 +15,4 @@
 
 """acmt001-mcp: a Model Context Protocol server for the acmt001 library."""
 
-__version__ = "0.0.2"
+__version__ = "0.0.5"
