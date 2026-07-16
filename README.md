@@ -121,14 +121,12 @@ ISO 20022 messages on demand.
 All tools delegate to the shared `acmt001.services` layer, so they behave
 identically to the CLI and REST API.
 
-| Tool | Purpose |
-|------|---------|
-| `list_message_types` | List the 34 supported acmt message types |
-| `get_required_fields` | Required input fields for a message type |
-| `get_input_schema` | Full input JSON Schema for a message type |
-| `validate_records` | Validate flat records against a message type |
-| `validate_identifier` | Validate an IBAN, BIC, or LEI |
-| `generate_message` | Generate a validated acmt XML message |
+- `list_message_types` — List the 34 supported acmt message types
+- `get_required_fields` — Required input fields for a message type
+- `get_input_schema` — Full input JSON Schema for a message type
+- `validate_records` — Validate flat records against a message type
+- `validate_identifier` — Validate an IBAN, BIC, or LEI
+- `generate_message` — Generate a validated acmt XML message
 
 ## Using the tools
 
