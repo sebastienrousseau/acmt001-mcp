@@ -380,6 +380,125 @@ def verify_lei_online(
     }
 
 
+# ---------------------------------------------------------------------------
+# Prompt.
+#
+# A guided workflow prompt that teaches an MCP client the canonical tool order
+# for onboarding a corporate account. Like the tools, it is a pure function of
+# its arguments -- it renders guidance text and never touches the backend.
+# ---------------------------------------------------------------------------
+@server.prompt(title="Onboard a corporate account")
+def onboard_corporate_account(
+    company_name: Annotated[
+        str,
+        Field(
+            description=(
+                "The legal name of the company being onboarded; left blank "
+                "for generic guidance."
+            )
+        ),
+    ] = "",
+    country: Annotated[
+        str,
+        Field(
+            description=(
+                "The ISO 3166-1 alpha-2 country code of the account owner, "
+                "e.g. 'GB'; left blank for generic guidance."
+            )
+        ),
+    ] = "",
+) -> str:
+    """Guide an agent through onboarding a corporate account end to end.
+
+    Renders a step-by-step playbook naming the tools to call and their order:
+    ``list_message_types`` to pick a message type, then
+    ``get_required_fields`` / ``get_input_schema`` to learn the input record,
+    then ``validate_records`` to check the batch, and finally
+    ``generate_message`` to emit the validated acmt XML.
+
+    Args:
+        company_name: The legal name of the company being onboarded.
+        country: The ISO 3166-1 alpha-2 country code of the account owner.
+
+    Returns:
+        A guidance string describing the recommended tool workflow.
+    """
+    subject = company_name.strip() or "a corporate account"
+    where = f" in {country.strip()}" if country.strip() else ""
+    return (
+        f"You are onboarding {subject}{where} as an ISO 20022 acmt account.\n"
+        "Follow this tool order:\n"
+        "1. Call list_message_types to choose the right acmt message type "
+        "(e.g. 'acmt.007.001.05' Account Opening Request).\n"
+        "2. Call get_required_fields for a quick checklist, then "
+        "get_input_schema for the full field types and constraints.\n"
+        "3. Assemble one flat record per account and call validate_records to "
+        "catch structural and identifier errors before generating.\n"
+        "4. Once validate_records reports valid, call generate_message to emit "
+        "the XSD-validated acmt XML document."
+    )
+
+
+# ---------------------------------------------------------------------------
+# Resources.
+#
+# Read-only views over the acmt001 catalogue, reusing the same ``services``
+# facade functions as the tools. The static resource exposes the full message
+# type catalogue; the templated resource describes a single message type's
+# input record. Both return a ``json.dumps`` string, mirroring the tools'
+# JSON-serializable contract.
+# ---------------------------------------------------------------------------
+@server.resource(
+    "acmt001://message-types",
+    title="acmt message type catalogue",
+    mime_type="application/json",
+)
+def message_types_resource() -> str:
+    """Expose the full acmt message type catalogue as a JSON resource.
+
+    This is the resource form of ``list_message_types``: it returns the same
+    ``[{"message_type": ..., "name": ...}, ...]`` catalogue, serialized as a
+    JSON string for clients that consume resources rather than tool calls.
+
+    Returns:
+        A JSON array string of ``{"message_type", "name"}`` objects.
+    """
+    return json.dumps(services.list_message_types())
+
+
+@server.resource(
+    "acmt001://describe/{message_type}",
+    title="Describe an acmt message type",
+    mime_type="application/json",
+)
+def describe_message_type_resource(message_type: _MessageType) -> str:
+    """Describe a single acmt message type's input record as a JSON resource.
+
+    This is the resource form of ``get_required_fields`` + ``get_input_schema``
+    for one message type: it returns both the required-field names and the full
+    input JSON Schema, serialized as a JSON string. On an unknown message type
+    it returns an ``{"error": ...}`` payload instead of raising, mirroring the
+    tools' error contract.
+
+    Args:
+        message_type: A supported ISO 20022 acmt message type.
+
+    Returns:
+        A JSON object string ``{"message_type", "required_fields",
+        "input_schema"}``, or ``{"error": ...}`` for an unknown type.
+    """
+    try:
+        return json.dumps(
+            {
+                "message_type": message_type,
+                "required_fields": services.get_required_fields(message_type),
+                "input_schema": services.get_input_schema(message_type),
+            }
+        )
+    except ValueError as exc:
+        return json.dumps({"error": str(exc)})
+
+
 def main() -> None:
     """Run the Acmt001 MCP server over stdio (the ``acmt001-mcp`` entry point)."""
     server.run()
