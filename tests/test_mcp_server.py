@@ -17,8 +17,11 @@
 
 import asyncio
 import json
+import sys
 
+import httpx
 import pytest
+import respx
 
 pytest.importorskip("mcp")
 
@@ -33,7 +36,35 @@ EXPECTED_TOOLS = {
     "validate_records",
     "validate_identifier",
     "generate_message",
+    "verify_lei_online",
 }
+
+# A synthetic, clearly-fake GLEIF-shaped response used only as a parsing
+# fixture. The LEI and entity details below are invented test data, NOT a claim
+# about any real registered entity; the assertions only check that the tool
+# maps these fields into the documented return shape.
+_TEST_LEI = "TEST0000000000000000"
+_CANNED_GLEIF_RESPONSE = {
+    "data": {
+        "type": "lei-records",
+        "id": _TEST_LEI,
+        "attributes": {
+            "lei": _TEST_LEI,
+            "entity": {
+                "legalName": {"name": "Example Test Entity", "language": "en"},
+                "legalAddress": {"country": "GB", "city": "London"},
+                "status": "ACTIVE",
+            },
+            "registration": {
+                "initialRegistrationDate": "2020-01-01T00:00:00Z",
+                "lastUpdateDate": "2024-06-01T00:00:00Z",
+                "status": "ISSUED",
+                "nextRenewalDate": "2025-06-01T00:00:00Z",
+            },
+        },
+    }
+}
+_GLEIF_URL = server._GLEIF_LEI_RECORD_URL.format(lei=_TEST_LEI)
 
 
 def _registered_tool_names() -> set[str]:
@@ -77,7 +108,7 @@ def test_server_and_main_are_well_formed():
 
 
 def test_all_tools_registered():
-    """All six tools are registered on the server."""
+    """Every tool (including verify_lei_online) is registered on the server."""
     assert _registered_tool_names() == EXPECTED_TOOLS
 
 
@@ -193,3 +224,65 @@ def test_call_tool_through_fastmcp(sample_record):
 
     payload = asyncio.run(go())
     assert payload["valid"] is True
+
+
+def test_verify_lei_online_is_open_world():
+    """The GLEIF lookup tool is annotated open-world, unlike the pure readers."""
+    assert server._EXTERNAL.openWorldHint is True
+    assert server._PURE_READ.openWorldHint is False
+
+
+@respx.mock
+def test_verify_lei_online_parses_gleif_response():
+    """A canned GLEIF response is mapped into the documented return shape."""
+    respx.get(_GLEIF_URL).mock(
+        return_value=httpx.Response(200, json=_CANNED_GLEIF_RESPONSE)
+    )
+    result = server.verify_lei_online(_TEST_LEI)
+    assert result == {
+        "lei": _TEST_LEI,
+        "legal_name": "Example Test Entity",
+        "status": "ACTIVE",
+        "country": "GB",
+        "registration_status": "ISSUED",
+        "initial_registration_date": "2020-01-01T00:00:00Z",
+        "last_update_date": "2024-06-01T00:00:00Z",
+        "next_renewal_date": "2025-06-01T00:00:00Z",
+    }
+
+
+@respx.mock
+def test_verify_lei_online_404_returns_not_found():
+    """An HTTP 404 from GLEIF surfaces as an 'LEI not found' error dict."""
+    respx.get(_GLEIF_URL).mock(return_value=httpx.Response(404))
+    result = server.verify_lei_online(_TEST_LEI)
+    assert result == {"error": f"LEI not found: {_TEST_LEI}"}
+
+
+@respx.mock
+def test_verify_lei_online_500_returns_unavailable():
+    """A non-200, non-404 response surfaces as a 'GLEIF API unavailable' error."""
+    respx.get(_GLEIF_URL).mock(return_value=httpx.Response(500))
+    result = server.verify_lei_online(_TEST_LEI)
+    assert result == {"error": "GLEIF API unavailable: HTTP 500"}
+
+
+@respx.mock
+def test_verify_lei_online_transport_error_returns_unavailable():
+    """A transport/connection error surfaces as a 'GLEIF API unavailable' error."""
+    respx.get(_GLEIF_URL).mock(
+        side_effect=httpx.ConnectError("connection refused")
+    )
+    result = server.verify_lei_online(_TEST_LEI)
+    assert "error" in result
+    assert result["error"].startswith("GLEIF API unavailable")
+
+
+def test_verify_lei_online_missing_extra_returns_error(monkeypatch):
+    """Without the 'online' extra (no httpx), a graceful install hint is returned."""
+    # Force ``import httpx`` inside the tool to raise ImportError, simulating
+    # an install without the optional [online] extra.
+    monkeypatch.setitem(sys.modules, "httpx", None)
+    result = server.verify_lei_online(_TEST_LEI)
+    assert "error" in result
+    assert "acmt001-mcp[online]" in result["error"]

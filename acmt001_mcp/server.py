@@ -83,6 +83,23 @@ _PURE_READ = ToolAnnotations(
     openWorldHint=False,
 )
 
+# Annotations for the single tool that reaches an external system. Unlike every
+# other tool here, ``verify_lei_online`` performs a live HTTP GET against the
+# public GLEIF LEI register, so it is open-world (``openWorldHint=True``). It is
+# still a non-destructive, idempotent read: it never mutates remote state, and
+# the same LEI yields the same record barring an upstream data change.
+_EXTERNAL = ToolAnnotations(
+    readOnlyHint=True,
+    destructiveHint=False,
+    idempotentHint=True,
+    openWorldHint=True,
+)
+
+# GLEIF (Global Legal Entity Identifier Foundation) public REST API endpoint for
+# a single LEI record. See https://api.gleif.org/. This is the one external
+# system this server contacts, and only from ``verify_lei_online``.
+_GLEIF_LEI_RECORD_URL = "https://api.gleif.org/api/v1/lei-records/{lei}"
+
 # ---------------------------------------------------------------------------
 # Closed-set parameter enums.
 #
@@ -278,6 +295,89 @@ def generate_message(
         return services.generate(message_type, records)
     except ValueError as exc:
         return json.dumps({"error": str(exc)})
+
+
+@server.tool(
+    title="Verify a LEI against the live GLEIF register",
+    annotations=_EXTERNAL,
+)
+def verify_lei_online(
+    lei_code: Annotated[
+        str,
+        Field(
+            description=(
+                "A 20-character ISO 17442 Legal Entity Identifier to look up "
+                "in the live GLEIF register, e.g. '5493001KJTIIGC8Y1R12'. Use "
+                "validate_identifier(kind='lei', ...) first for a purely "
+                "offline check-digit/format check."
+            )
+        ),
+    ],
+) -> dict:
+    """Verify a LEI against the live GLEIF register (reaches the network).
+
+    Unlike ``validate_identifier``, which checks an LEI's format and check
+    digits entirely offline, this tool performs a live HTTP GET against the
+    public GLEIF REST API (``api.gleif.org``) to confirm the LEI is actually
+    registered and to return the registered entity's details. It therefore
+    requires network access and is marked open-world.
+
+    Requires the optional ``online`` extra (``pip install acmt001-mcp[online]``)
+    for the ``httpx`` HTTP client; without it a graceful ``{"error": ...}`` is
+    returned rather than raising.
+
+    Returns a dict with the ``lei``, registered ``legal_name``, entity
+    ``status``, ``country``, and registration ``registration_status``,
+    ``initial_registration_date``, ``last_update_date`` and
+    ``next_renewal_date``. On failure returns ``{"error": ...}``: an
+    ``LEI not found`` error for an unregistered LEI (HTTP 404), or a
+    ``GLEIF API unavailable`` error for any other non-200 response or a
+    transport/connection error.
+
+    Args:
+        lei_code: A 20-character ISO 17442 Legal Entity Identifier.
+    """
+    try:
+        import httpx
+    except ImportError:
+        return {
+            "error": (
+                "verify_lei_online requires the optional 'online' extra; "
+                "install it with: pip install acmt001-mcp[online]"
+            )
+        }
+
+    url = _GLEIF_LEI_RECORD_URL.format(lei=lei_code)
+    try:
+        response = httpx.get(
+            url,
+            timeout=10.0,
+            headers={"Accept": "application/vnd.api+json"},
+        )
+    except httpx.HTTPError as exc:
+        return {"error": f"GLEIF API unavailable: {exc}"}
+
+    if response.status_code == 404:
+        return {"error": f"LEI not found: {lei_code}"}
+    if response.status_code != 200:
+        return {"error": f"GLEIF API unavailable: HTTP {response.status_code}"}
+
+    attributes = response.json().get("data", {}).get("attributes", {})
+    entity = attributes.get("entity", {})
+    registration = attributes.get("registration", {})
+
+    return {
+        "lei": attributes.get("lei", lei_code),
+        "legal_name": entity.get("legalName", {}).get("name"),
+        "status": entity.get("status"),
+        "country": entity.get("legalAddress", {}).get("country"),
+        "registration_status": registration.get("status"),
+        "initial_registration_date": registration.get(
+            "initialRegistrationDate"
+        ),
+        "last_update_date": registration.get("lastUpdateDate"),
+        "next_renewal_date": registration.get("nextRenewalDate"),
+    }
 
 
 def main() -> None:
