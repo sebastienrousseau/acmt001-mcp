@@ -26,12 +26,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Installs this package; its core `acmt001` dependency resolves from PyPI.
+      # Installs this package with the `online` extra (httpx) so the live
+      # GLEIF lookup tool (verify_lei_online) and its mocked tests are
+      # exercised; the core `acmt001` dependency resolves from PyPI. respx
+      # mocks the HTTP boundary so tests never touch the network.
       - name: Install this package (+ acmt001 from PyPI)
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
-          pip install pytest pytest-cov
+          pip install -e ".[online]"
+          pip install pytest pytest-cov respx
 
       - name: Run tests
         run: pytest tests/ -v --tb=short
@@ -48,12 +51,13 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Install this package (acmt001 resolves from PyPI) so mypy can resolve
-      # `acmt001.services`.
+      # Install this package with the `online` extra (acmt001 resolves from
+      # PyPI) so mypy can resolve both `acmt001.services` and the optional
+      # `httpx` import inside verify_lei_online.
       - name: Install this package (+ acmt001 from PyPI)
         run: |
           python -m pip install --upgrade pip
-          pip install .
+          pip install ".[online]"
           pip install ruff black mypy
 
       - name: Ruff check

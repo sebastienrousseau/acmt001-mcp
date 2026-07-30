@@ -18,6 +18,12 @@ acmt001-mcp = "acmt001_mcp.server:main"
 python = ">=3.10,<4.0"
 acmt001 = ">=0.0.2"
 mcp = ">=1.2,<2"
+# Optional HTTP client for the live GLEIF lookup (verify_lei_online); only
+# installed with the ``online`` extra so the base install stays network-free.
+httpx = { version = ">=0.27,<1", optional = true }
+
+[tool.poetry.extras]
+online = ["httpx"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=9.0.3,<10.0.0"
@@ -26,6 +32,7 @@ black = "^26.3.1"
 ruff = "^0.1.0"
 mypy = "^1.11.0"
 bandit = "^1.7.0"
+respx = ">=0.21,<1"
 
 [build-system]
 requires = ["poetry-core"]
