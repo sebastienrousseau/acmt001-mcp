@@ -176,6 +176,75 @@ def test_main_runs_the_server(monkeypatch):
     assert calls == [True]
 
 
+def test_prompt_registered():
+    """The onboarding prompt is registered on the server."""
+    names = {p.name for p in server.server._prompt_manager.list_prompts()}
+    assert "onboard_corporate_account" in names
+
+
+def test_onboard_prompt_with_args():
+    """With a company and country, the prompt names them and the tool order."""
+    text = server.onboard_corporate_account("Acme Ltd", "GB")
+    assert "Acme Ltd" in text
+    assert "in GB" in text
+    assert "list_message_types" in text
+    assert "get_required_fields" in text
+    assert "get_input_schema" in text
+    assert "validate_records" in text
+    assert "generate_message" in text
+
+
+def test_onboard_prompt_empty_args():
+    """With blank args, the prompt falls back to generic guidance."""
+    text = server.onboard_corporate_account()
+    assert "a corporate account" in text
+    assert "in " not in text.split("\n", 1)[0]
+    assert "list_message_types" in text
+
+
+def test_resources_registered():
+    """The static catalogue resource and templated describe resource exist."""
+    static_uris = {
+        str(r.uri) for r in server.server._resource_manager.list_resources()
+    }
+    assert "acmt001://message-types" in static_uris
+
+    template_uris = {
+        t.uri_template
+        for t in server.server._resource_manager.list_templates()
+    }
+    assert "acmt001://describe/{message_type}" in template_uris
+
+
+def test_message_types_resource_matches_tool():
+    """The static resource returns the same catalogue as the tool, as JSON."""
+    payload = json.loads(server.message_types_resource())
+    assert payload == server.list_message_types()
+    assert len(payload) == 34
+
+
+def test_describe_resource_returns_fields_and_schema():
+    """The templated resource returns required fields and the input schema."""
+    payload = json.loads(
+        server.describe_message_type_resource("acmt.007.001.05")
+    )
+    assert payload["message_type"] == "acmt.007.001.05"
+    assert payload["required_fields"] == server.get_required_fields(
+        "acmt.007.001.05"
+    )
+    assert payload["input_schema"] == server.get_input_schema(
+        "acmt.007.001.05"
+    )
+
+
+def test_describe_resource_unknown_type_returns_error():
+    """An unknown message type surfaces an error payload, not an exception."""
+    payload = json.loads(
+        server.describe_message_type_resource("acmt.999.999.99")
+    )
+    assert "error" in payload
+
+
 def test_call_tool_through_fastmcp(sample_record):
     """Tools are invocable through the FastMCP dispatch layer."""
 
