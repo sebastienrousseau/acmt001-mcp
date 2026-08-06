@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "acmt001-mcp"
-version = "0.0.6"
+version = "0.0.7"
 description = "Model Context Protocol (MCP) server exposing the acmt001 ISO 20022 Account Management library as agent tools."
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 license = "Apache-2.0"
