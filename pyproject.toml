@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "acmt001-mcp"
-version = "0.0.7"
+version = "0.0.8"
 description = "Model Context Protocol (MCP) server exposing the acmt001 ISO 20022 Account Management library as agent tools."
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 license = "Apache-2.0 OR MIT"
@@ -19,7 +19,7 @@ python = ">=3.10,<4.0"
 # 0.0.2 and 0.0.3 both cap cryptography<50.0.0, which makes the
 # floor below unresolvable against them. 0.0.4 is the first release
 # that admits the patched cryptography.
-acmt001 = ">=0.0.4"
+acmt001 = ">=0.0.5"
 mcp = ">=1.2,<2"
 # Optional HTTP client for the live GLEIF lookup (verify_lei_online); only
 # installed with the ``online`` extra so the base install stays network-free.

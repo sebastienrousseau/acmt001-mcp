@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.8] - 2026-08-28
+
+The first release since 0.0.6. `0.0.7` was bumped in the tree but never
+tagged or published, so everything below has been sitting unreleased —
+including the `cryptography` advisory floor.
+
+### Changed
+
+- **The `acmt001` floor moves to `>=0.0.5`,** from `>=0.0.2`. 0.0.5 is
+  the first release built against `xmlschema >=4.3.2`. The floor has to
+  move with it: anything lower admits 0.0.4, which pins
+  `xmlschema<4.0.0` and cannot be installed beside `pain001` or
+  `camt053`. A resolver that lands there reports `ResolutionImpossible`
+  without naming the cause.
+
+- Licensing ships as `Apache-2.0 OR MIT` (#18).
+
+### Fixed
+
+- **`cryptography` floored at 50.0.0** — the release that patches a
+  high-severity advisory — and `acmt001` taken at 0.0.4 (#16, #17).
+  Cut as `0.0.7` in the tree, but never published, so no dependent has
+  had it.
+
+### Added
+
+- Online GLEIF LEI verification tool (#14).
+- Prompts and resources, for parity across the MCP suite (#13).
+
+## [0.0.6] - 2026-07-16
+
+Undocumented at the time; reconstructed from the commit history.
+
+### Fixed
+
+- `mcp` capped below 2.0. 2.0 removed `mcp.server.fastmcp`, the import
+  this server uses, which broke a plain `pip install .` (#12).
+
+### Changed
+
+- Release workflow emits real provenance and an SBOM on publish (#11).
+- README cross-links the full ISO 20022 MCP suite.
+
 ## [0.0.5] - 2026-07-11
 
 The **quality & hardening** cut. Bundles the tooling/discoverability work
