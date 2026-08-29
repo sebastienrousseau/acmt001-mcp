@@ -26,6 +26,7 @@ identifiers, and generate validated XML, all from your favourite MCP client.
 - [Quick Start](#quick-start)
 - [Tools](#tools)
 - [Using the tools](#using-the-tools)
+- [Benchmarks](#benchmarks)
 - [Development](#development)
 - [Licence](#licence)
 - [Contribution](#contribution)
@@ -184,6 +185,30 @@ Run it directly:
 ```sh
 python examples/mcp_tools.py
 ```
+
+## Benchmarks
+
+```sh
+python benches/bench_tool_dispatch.py           # full run
+python benches/bench_tool_dispatch.py --quick   # what CI runs
+```
+
+The benchmark measures what an *agent* waits for: the dispatch floor
+(`list_message_types`, around a microsecond), the metadata lookups used
+to build a request, and the two batch tools side by side.
+
+The result worth knowing is the asymmetry between those two.
+`validate_records` checks every record, so it is linear in batch size.
+`generate_message`, for a single-account message type like the default
+`acmt.007.001.05`, renders **only the first record** — twenty-seven of
+the thirty-four templates work this way. So validating a hundred records
+and generating from them costs roughly 260 ms of validation against 6 ms
+of generation, and returns one message rather than a hundred.
+
+That is correct ISO 20022 behaviour and a real trap when batching, which
+is why the benchmark prints output size beside the timings: flat bytes
+across growing input is what tells you the rest of the batch was not
+rendered. See [docs/benchmarks.md](docs/benchmarks.md).
 
 ## Development
 
