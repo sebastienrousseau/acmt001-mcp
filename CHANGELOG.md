@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.9] - 2026-08-29
+
+Aligns the `acmt001` suite on one version number, and adds the two gates
+that were missing: a benchmark and a scheduled drift check.
+
+### Added
+
+- `benches/bench_tool_dispatch.py` measures what an agent waits for: the
+  dispatch floor, the metadata lookups used to build a request, and the
+  two batch tools side by side. It records the asymmetry between them —
+  `validate_records` is linear in batch size while `generate_message`
+  renders only the first record for a single-account message type, so a
+  hundred-record batch costs a hundred validations and yields one
+  message.
+- `docs/benchmarks.md` explaining that result and when it bites.
+- `scripts/check_suite_consistency.py` and a scheduled `Suite
+  Consistency` workflow compare this tree, and every published member of
+  the suite, against PyPI.
+- `tests/test_suite_conformance.py`, the shared suite conformance gate.
+- `SECURITY.md`, written for an MCP server: the stdio transport has no
+  authentication of its own, tool inputs arrive from a model rather than
+  a person who read the docs, and `verify_lei_online` is the one tool
+  that makes an outbound call.
+
+### Changed
+
+- Version aligned to `0.0.9` across `acmt001`, `acmt001-lsp` and
+  `acmt001-mcp`. These three ship as one suite and had drifted to
+  `0.0.5`, `0.0.2` and `0.0.8` respectively.
+
 ## [0.0.8] - 2026-08-28
 
 The first release since 0.0.6. `0.0.7` was bumped in the tree but never
