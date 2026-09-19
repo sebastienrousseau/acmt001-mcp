@@ -270,10 +270,17 @@ A `Makefile` orchestrates the quality gates (kept in lockstep with CI):
 
 ```bash
 make check        # all gates (REQUIRED before commit)
-make test         # pytest
+make test         # pytest, 100% line and branch coverage
 make lint         # ruff + black
 make type-check   # mypy --strict
+make doc-coverage # interrogate, 100% docstrings
+make mutate       # mutmut over the tool handlers, gated on the score
+make docs         # Sphinx site, warnings are errors
 ```
+
+The property-based tests (Hypothesis) run as part of `make test`; set
+`HYPOTHESIS_PROFILE=mutation` for the slimmer profile the mutation run
+uses.
 
 ## Related MCP Servers
 

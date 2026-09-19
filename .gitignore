@@ -40,6 +40,9 @@ tmp/
 .ruff_cache/
 acmt001_mcp.egg-info/
 
+# mutmut 3 working copy and results
+mutants/
+
 # Hypothesis example database
 .hypothesis/
 
