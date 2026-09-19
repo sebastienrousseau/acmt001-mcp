@@ -41,10 +41,19 @@ mypy = "^1.11.0"
 bandit = "^1.7.0"
 respx = ">=0.21,<1"
 hypothesis = ">=6.100,<7"
+interrogate = "^1.7.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.interrogate]
+fail-under = 100
+ignore-init-method = true
+ignore-semiprivate = false
+ignore-private = false
+ignore-magic = true
+exclude = ["tests", "benches", "examples", "docs", "scripts"]
 
 [tool.black]
 # The vendored conformance test carries a digest of its own bytes,

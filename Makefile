@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format type-check security clean examples check
+.PHONY: help install dev test lint format type-check security clean examples doc-coverage check
 
 PYTHON ?= python3
 POETRY ?= poetry
@@ -32,7 +32,7 @@ security: ## Run security scan (bandit)
 		$(POETRY) run bandit -r acmt001_mcp/ -ll
 
 clean: ## Remove build artifacts and caches
-	rm -rf build/ dist/ *.egg-info .eggs/
+	rm -rf build/ dist/ *.egg-info .eggs/ .hypothesis/
 	rm -rf .pytest_cache/ .mypy_cache/ .ruff_cache/ htmlcov/
 	rm -rf coverage.xml .coverage
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
@@ -41,4 +41,7 @@ clean: ## Remove build artifacts and caches
 examples: ## Verify example scripts run
 	$(POETRY) run python examples/mcp_tools.py
 
-check: lint type-check test examples ## Run all checks
+doc-coverage: ## Enforce the 100% docstring coverage gate
+	$(POETRY) run interrogate -c pyproject.toml -v acmt001_mcp
+
+check: lint type-check test doc-coverage examples ## Run all gates
