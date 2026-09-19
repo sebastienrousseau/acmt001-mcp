@@ -46,7 +46,8 @@ Launching the server:
           }
         }
 
-The server communicates over stdio (the SDK's default transport).
+stdio by default; ``--transport streamable-http`` or ``--transport sse``
+listens on ``--host``/``--port`` instead. See :mod:`acmt001_mcp._cli`.
 """
 
 import json
@@ -59,7 +60,7 @@ from acmt001.constants import valid_xml_types
 from mcp.types import ToolAnnotations
 from pydantic import Field
 
-from acmt001_mcp import __version__
+from acmt001_mcp import __version__, _cli
 from acmt001_mcp._mcp_compat import build_server
 
 # The shim picks FastMCP (mcp 1.x) or MCPServer (mcp 2.x) and reports
@@ -550,9 +551,16 @@ def describe_message_type_resource(message_type: _MessageType) -> str:
         return json.dumps({"error": str(exc)})
 
 
-def main() -> None:
-    """Run the Acmt001 MCP server over stdio (the ``acmt001-mcp`` entry point)."""
-    server.run()
+def main(argv: list[str] | None = None) -> None:
+    """Run the acmt001 MCP server (the ``acmt001-mcp`` entry point).
+
+    stdio by default; ``--transport streamable-http`` or ``--transport sse``
+    listens on ``--host``/``--port`` instead. See :mod:`acmt001_mcp._cli`.
+
+    Args:
+        argv: Command-line arguments; ``None`` reads ``sys.argv[1:]``.
+    """
+    _cli.serve(server, argv, "acmt001-mcp", __version__)
 
 
 if __name__ == "__main__":
