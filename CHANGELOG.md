@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `generate_message` returns an `{"error": ...}` payload when the rendered XML
+  fails its XSD, instead of letting the library's `RuntimeError` escape; the
+  SDK reported that as a bare "Error executing tool" with the reason kept on
+  the server. The schema's install path is dropped from the message.
+
 ### Changed
+
+- `verify_lei_online` remembers GLEIF answers (hits and not-found) for five
+  minutes, bounded to 256 entries, so repeat lookups of one LEI in a session
+  are answered without a round trip; transport failures are not cached.
 
 - The server is built through a small compatibility shim so it runs on
   both supported majors of the `mcp` SDK: 2.x (`MCPServer`, the
