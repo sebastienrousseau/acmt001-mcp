@@ -25,8 +25,7 @@ import respx
 
 pytest.importorskip("mcp")
 
-from mcp.server.fastmcp import FastMCP  # noqa: E402
-
+import acmt001_mcp._mcp_compat as compat  # noqa: E402
 import acmt001_mcp.server as server  # noqa: E402
 
 EXPECTED_TOOLS = {
@@ -84,7 +83,8 @@ def _tool_input_schema(name: str) -> dict:
     """Return the JSON input schema a client sees for the named tool."""
     for tool in asyncio.run(server.server.list_tools()):
         if tool.name == name:
-            return tool.inputSchema
+            # snake_case on mcp 2.x, camelCase on 1.x
+            return getattr(tool, "input_schema", None) or tool.inputSchema
     raise AssertionError(f"tool not registered: {name}")
 
 
@@ -103,7 +103,7 @@ def test_identifier_kind_param_exposes_enum():
 
 def test_server_and_main_are_well_formed():
     """The module exposes a FastMCP server and a callable ``main``."""
-    assert isinstance(server.server, FastMCP)
+    assert isinstance(server.server, compat.MCPServer)
     assert callable(server.main)
 
 
@@ -283,13 +283,10 @@ def test_call_tool_through_fastmcp(sample_record):
         result = await server.server.call_tool(
             "validate_identifier", {"kind": "bic", "value": "NWBKGB2LXXX"}
         )
-        # call_tool returns a sequence of content blocks; extract the text.
-        block = result[0] if isinstance(result, list | tuple) else result
-        text = getattr(block, "text", None)
-        if text is None and isinstance(result, tuple):
-            # Newer FastMCP returns (content, structured) tuples.
-            text = json.dumps(result[1])
-        return json.loads(text)
+        structured = compat.result_structured(result)
+        if structured is not None:
+            return structured
+        return json.loads(compat.result_content(result)[0].text)
 
     payload = asyncio.run(go())
     assert payload["valid"] is True
@@ -297,8 +294,11 @@ def test_call_tool_through_fastmcp(sample_record):
 
 def test_verify_lei_online_is_open_world():
     """The GLEIF lookup tool is annotated open-world, unlike the pure readers."""
-    assert server._EXTERNAL.openWorldHint is True
-    assert server._PURE_READ.openWorldHint is False
+    # by_alias gives the wire (camelCase) names on both SDK majors
+    assert server._EXTERNAL.model_dump(by_alias=True)["openWorldHint"] is True
+    assert (
+        server._PURE_READ.model_dump(by_alias=True)["openWorldHint"] is False
+    )
 
 
 @respx.mock
@@ -355,3 +355,79 @@ def test_verify_lei_online_missing_extra_returns_error(monkeypatch):
     result = server.verify_lei_online(_TEST_LEI)
     assert "error" in result
     assert "acmt001-mcp[online]" in result["error"]
+
+
+# --------------------------------------------------------------------------
+# generate_message: a schema failure is data, not a crash
+# --------------------------------------------------------------------------
+def test_generate_message_schema_failure_is_error_payload():
+    """A record set that renders XML the XSD rejects comes back as an
+    ``{"error": ...}`` payload naming the schema, never as an exception the
+    SDK would mask as "Error executing tool"."""
+    payload = json.loads(server.generate_message("acmt.035.001.02", [{}]))
+    assert "error" in payload
+    assert "failed validation" in payload["error"]
+    assert "acmt.035.001.02.xsd" in payload["error"]
+    assert "/site-packages/" not in payload["error"]
+
+
+# --------------------------------------------------------------------------
+# verify_lei_online: repeat lookups are answered from the cache
+# --------------------------------------------------------------------------
+@pytest.fixture(autouse=True)
+def _clear_lei_cache():
+    server._lei_cache.clear()
+    yield
+    server._lei_cache.clear()
+
+
+@respx.mock
+def test_verify_lei_online_repeat_lookup_is_cached():
+    """The second ask for the same LEI does not reach GLEIF."""
+    route = respx.get(_GLEIF_URL).mock(
+        return_value=httpx.Response(200, json=_CANNED_GLEIF_RESPONSE)
+    )
+    first = server.verify_lei_online(_TEST_LEI)
+    second = server.verify_lei_online(_TEST_LEI)
+    assert first == second
+    assert route.call_count == 1
+
+
+@respx.mock
+def test_verify_lei_online_not_found_is_cached_too():
+    """A 404 is as stable as a hit, so it is remembered as well."""
+    route = respx.get(_GLEIF_URL).mock(return_value=httpx.Response(404))
+    assert "error" in server.verify_lei_online(_TEST_LEI)
+    assert "error" in server.verify_lei_online(_TEST_LEI)
+    assert route.call_count == 1
+
+
+@respx.mock
+def test_verify_lei_online_outage_is_not_cached():
+    """A transport failure is retried on the next call."""
+    route = respx.get(_GLEIF_URL).mock(side_effect=httpx.ConnectError("down"))
+    assert "unavailable" in server.verify_lei_online(_TEST_LEI)["error"]
+    assert "unavailable" in server.verify_lei_online(_TEST_LEI)["error"]
+    assert route.call_count == 2
+
+
+@respx.mock
+def test_verify_lei_online_cache_expires(monkeypatch):
+    """After the TTL the LEI is looked up again."""
+    route = respx.get(_GLEIF_URL).mock(
+        return_value=httpx.Response(200, json=_CANNED_GLEIF_RESPONSE)
+    )
+    now = {"t": 1000.0}
+    monkeypatch.setattr(server.time, "monotonic", lambda: now["t"])
+    server.verify_lei_online(_TEST_LEI)
+    now["t"] += server._LEI_CACHE_TTL_SECONDS + 1
+    server.verify_lei_online(_TEST_LEI)
+    assert route.call_count == 2
+
+
+def test_lei_cache_is_bounded():
+    """The cache never grows past its bound; the oldest entry goes first."""
+    for i in range(server._LEI_CACHE_MAX_ENTRIES + 5):
+        server._lei_cache_put(f"LEI{i:017d}", {"lei": str(i)})
+    assert len(server._lei_cache) == server._LEI_CACHE_MAX_ENTRIES
+    assert "LEI00000000000000000" not in server._lei_cache

@@ -9,13 +9,14 @@
 [![Tests][tests-badge]][tests-url]
 [![Quality][quality-badge]][quality-url]
 [![Documentation][docs-badge]][docs-url]
+[![Glama MCP server score][glama-badge]][glama-url]
 
 **A [Model Context Protocol][mcp] server that exposes the [`acmt001`][core]
 ISO 20022 Account Management library as tools for AI agents and assistants** —
 discover message types, inspect input schemas, validate records and financial
 identifiers, and generate validated XML, all from your favourite MCP client.
 
-> **Latest release: v0.0.5** — six MCP tools over stdio, all backed by the
+> **Latest release: v0.0.9** — 7 MCP tools over stdio, all backed by the
 > shared `acmt001.services` layer, for Python 3.10+.
 > [See what's new →][release-005]
 
@@ -97,7 +98,7 @@ python -m pip install -U acmt001-mcp
 
 ## Quick Start
 
-Launch the server over stdio (the FastMCP default transport):
+Launch the server over stdio (the SDK's default transport):
 
 ```sh
 acmt001-mcp
@@ -132,7 +133,7 @@ identically to the CLI and REST API.
 ## Using the tools
 
 You can invoke the tools in-process — without a transport — straight through the
-FastMCP instance. This mirrors what an agent receives over stdio. The runnable
+server instance. This mirrors what an agent receives over stdio. The runnable
 version of this snippet lives in [`examples/mcp_tools.py`](examples/mcp_tools.py).
 
 ```python
@@ -291,3 +292,5 @@ Built on the [`acmt001`][core] ISO 20022 Account Management library and the
 [quality-url]: https://github.com/sebastienrousseau/acmt001-mcp/actions/workflows/ci.yml
 [tests-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/acmt001-mcp/ci.yml?branch=main&label=Tests&style=for-the-badge
 [tests-url]: https://github.com/sebastienrousseau/acmt001-mcp/actions/workflows/ci.yml
+[glama-badge]: https://glama.ai/mcp/servers/sebastienrousseau/acmt001-mcp/badges/score.svg
+[glama-url]: https://glama.ai/mcp/servers/sebastienrousseau/acmt001-mcp

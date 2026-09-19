@@ -46,25 +46,25 @@ Launching the server:
           }
         }
 
-The server communicates over stdio (FastMCP's default transport).
+The server communicates over stdio (the SDK's default transport).
 """
 
 import json
+import re
+import time
 from typing import Annotated
 
 from acmt001 import services
 from acmt001.constants import valid_xml_types
-from mcp.server.fastmcp import FastMCP
 from mcp.types import ToolAnnotations
 from pydantic import Field
 
 from acmt001_mcp import __version__
+from acmt001_mcp._mcp_compat import build_server
 
-server = FastMCP("acmt001")
-# FastMCP does not expose a version kwarg; without this override the
-# MCP SDK's own version leaks into serverInfo.version, breaking
-# manifest/runtime coherence checks (e.g. Glama scoring).
-server._mcp_server.version = __version__
+# The shim picks FastMCP (mcp 1.x) or MCPServer (mcp 2.x) and reports
+# the package version in serverInfo either way.
+server = build_server("acmt001", __version__)
 
 # Shared MCP tool annotations. Every tool in this server is a pure,
 # side-effect-free reader over the acmt001 ``services`` facade: each tool
@@ -76,7 +76,7 @@ server._mcp_server.version = __version__
 #
 # These hints let MCP clients (and the Glama quality grader) reason about
 # safety, caching, and auto-approval without executing the tool.
-_PURE_READ = ToolAnnotations(
+_PURE_READ = ToolAnnotations(  # type: ignore[call-arg]
     readOnlyHint=True,
     destructiveHint=False,
     idempotentHint=True,
@@ -88,7 +88,7 @@ _PURE_READ = ToolAnnotations(
 # public GLEIF LEI register, so it is open-world (``openWorldHint=True``). It is
 # still a non-destructive, idempotent read: it never mutates remote state, and
 # the same LEI yields the same record barring an upstream data change.
-_EXTERNAL = ToolAnnotations(
+_EXTERNAL = ToolAnnotations(  # type: ignore[call-arg]
     readOnlyHint=True,
     destructiveHint=False,
     idempotentHint=True,
@@ -293,8 +293,50 @@ def generate_message(
     """
     try:
         return services.generate(message_type, records)
-    except ValueError as exc:
-        return json.dumps({"error": str(exc)})
+    except (ValueError, RuntimeError) as exc:
+        # The library raises RuntimeError when the rendered XML fails its
+        # XSD; to the caller that is a validation error like any other,
+        # and the SDK would otherwise hide the reason behind a bare
+        # "Error executing tool". The schema's install path is noise.
+        return json.dumps({"error": _without_paths(str(exc))})
+
+
+def _without_paths(message: str) -> str:
+    """Replace absolute file paths in ``message`` with their basename."""
+    return re.sub(r"/\S*/([^/\s]+)", r"\1", message)
+
+
+# A GLEIF record does not change from one minute to the next, but an agent
+# often asks about the same LEI several times in one session, and each ask
+# is a round trip to api.gleif.org (a second or two). Answers are kept for
+# a short while; transport failures are not, so a retry reaches the API.
+_LEI_CACHE_TTL_SECONDS = 300.0
+_LEI_CACHE_MAX_ENTRIES = 256
+_lei_cache: dict[str, tuple[float, dict]] = {}
+
+
+def _lei_cache_get(lei_code: str) -> dict | None:
+    """Return the cached answer for ``lei_code`` if it has not expired."""
+    entry = _lei_cache.get(lei_code)
+    if entry is None:
+        return None
+    expires_at, answer = entry
+    if time.monotonic() >= expires_at:
+        del _lei_cache[lei_code]
+        return None
+    return dict(answer)
+
+
+def _lei_cache_put(lei_code: str, answer: dict) -> dict:
+    """Remember ``answer`` for ``lei_code`` and return it."""
+    if len(_lei_cache) >= _LEI_CACHE_MAX_ENTRIES:
+        oldest = min(_lei_cache, key=lambda k: _lei_cache[k][0])
+        del _lei_cache[oldest]
+    _lei_cache[lei_code] = (
+        time.monotonic() + _LEI_CACHE_TTL_SECONDS,
+        dict(answer),
+    )
+    return dict(answer)
 
 
 @server.tool(
@@ -347,6 +389,10 @@ def verify_lei_online(
             )
         }
 
+    cached = _lei_cache_get(lei_code)
+    if cached is not None:
+        return cached
+
     url = _GLEIF_LEI_RECORD_URL.format(lei=lei_code)
     try:
         response = httpx.get(
@@ -358,7 +404,9 @@ def verify_lei_online(
         return {"error": f"GLEIF API unavailable: {exc}"}
 
     if response.status_code == 404:
-        return {"error": f"LEI not found: {lei_code}"}
+        return _lei_cache_put(
+            lei_code, {"error": f"LEI not found: {lei_code}"}
+        )
     if response.status_code != 200:
         return {"error": f"GLEIF API unavailable: HTTP {response.status_code}"}
 
@@ -366,18 +414,21 @@ def verify_lei_online(
     entity = attributes.get("entity", {})
     registration = attributes.get("registration", {})
 
-    return {
-        "lei": attributes.get("lei", lei_code),
-        "legal_name": entity.get("legalName", {}).get("name"),
-        "status": entity.get("status"),
-        "country": entity.get("legalAddress", {}).get("country"),
-        "registration_status": registration.get("status"),
-        "initial_registration_date": registration.get(
-            "initialRegistrationDate"
-        ),
-        "last_update_date": registration.get("lastUpdateDate"),
-        "next_renewal_date": registration.get("nextRenewalDate"),
-    }
+    return _lei_cache_put(
+        lei_code,
+        {
+            "lei": attributes.get("lei", lei_code),
+            "legal_name": entity.get("legalName", {}).get("name"),
+            "status": entity.get("status"),
+            "country": entity.get("legalAddress", {}).get("country"),
+            "registration_status": registration.get("status"),
+            "initial_registration_date": registration.get(
+                "initialRegistrationDate"
+            ),
+            "last_update_date": registration.get("lastUpdateDate"),
+            "next_renewal_date": registration.get("nextRenewalDate"),
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
