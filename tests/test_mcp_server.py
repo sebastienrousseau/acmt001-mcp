@@ -132,7 +132,12 @@ def test_validate_identifier_valid_and_invalid():
 def test_validate_identifier_unsupported_kind_returns_error():
     """An unsupported identifier kind yields an error dict, not an exception."""
     result = server.validate_identifier("ssn", "123-45-6789")
-    assert "error" in result
+    assert result == {
+        "error": (
+            "Unsupported identifier kind: 'ssn'. "
+            "Expected one of: bic, iban, lei."
+        )
+    }
 
 
 def test_generate_message_returns_xml(sample_record):
@@ -149,9 +154,8 @@ def test_invalid_message_type_returns_error_dict():
     # get_required_fields returns a list; the error is surfaced as a string
     # entry. The schema-bearing tools return an error dict directly.
     schema_result = server.get_input_schema("acmt.999.999.99")
-    assert isinstance(schema_result, dict)
-    assert "error" in schema_result
-    assert any("error" in str(item) for item in result)
+    assert schema_result == {"error": "Invalid message type: acmt.999.999.99"}
+    assert result == ["error: Invalid message type: acmt.999.999.99"]
 
 
 def test_generate_message_error_is_serializable():
@@ -184,8 +188,7 @@ def test_validate_records_reports_errors(sample_record):
 def test_validate_records_invalid_message_type_returns_error_dict():
     """An unsupported message type returns an ``{"error": ...}`` dict."""
     result = server.validate_records("acmt.999.999.99", [{}])
-    assert isinstance(result, dict)
-    assert "error" in result
+    assert result == {"error": "Invalid message type: acmt.999.999.99"}
 
 
 def test_list_message_types_value_error_returns_error_list(monkeypatch):
@@ -228,9 +231,21 @@ def test_onboard_prompt_with_args():
 def test_onboard_prompt_empty_args():
     """With blank args, the prompt falls back to generic guidance."""
     text = server.onboard_corporate_account()
-    assert "a corporate account" in text
     assert "in " not in text.split("\n", 1)[0]
-    assert "list_message_types" in text
+    # The playbook is what an agent reads, so its wording is the contract.
+    assert text == (
+        "You are onboarding a corporate account as an ISO 20022 acmt "
+        "account.\n"
+        "Follow this tool order:\n"
+        "1. Call list_message_types to choose the right acmt message type "
+        "(e.g. 'acmt.007.001.05' Account Opening Request).\n"
+        "2. Call get_required_fields for a quick checklist, then "
+        "get_input_schema for the full field types and constraints.\n"
+        "3. Assemble one flat record per account and call validate_records "
+        "to catch structural and identifier errors before generating.\n"
+        "4. Once validate_records reports valid, call generate_message to "
+        "emit the XSD-validated acmt XML document."
+    )
 
 
 def test_resources_registered():
@@ -273,7 +288,7 @@ def test_describe_resource_unknown_type_returns_error():
     payload = json.loads(
         server.describe_message_type_resource("acmt.999.999.99")
     )
-    assert "error" in payload
+    assert payload == {"error": "Invalid message type: acmt.999.999.99"}
 
 
 def test_call_tool_through_fastmcp(sample_record):
@@ -353,8 +368,60 @@ def test_verify_lei_online_missing_extra_returns_error(monkeypatch):
     # an install without the optional [online] extra.
     monkeypatch.setitem(sys.modules, "httpx", None)
     result = server.verify_lei_online(_TEST_LEI)
-    assert "error" in result
-    assert "acmt001-mcp[online]" in result["error"]
+    assert result == {
+        "error": (
+            "verify_lei_online requires the optional 'online' extra; "
+            "install it with: pip install acmt001-mcp[online]"
+        )
+    }
+
+
+@respx.mock
+def test_verify_lei_online_asks_gleif_for_json_api_with_a_timeout():
+    """The request names the JSON:API media type and bounds its wait."""
+    route = respx.get(_GLEIF_URL).mock(
+        return_value=httpx.Response(200, json=_CANNED_GLEIF_RESPONSE)
+    )
+    server.verify_lei_online(_TEST_LEI)
+    request = route.calls.last.request
+    assert request.headers["Accept"] == "application/vnd.api+json"
+    assert request.extensions["timeout"] == {
+        "connect": 10.0,
+        "read": 10.0,
+        "write": 10.0,
+        "pool": 10.0,
+    }
+
+
+@respx.mock
+def test_verify_lei_online_tolerates_a_sparse_record():
+    """A record with none of the optional sections still maps every key."""
+    respx.get(_GLEIF_URL).mock(
+        return_value=httpx.Response(200, json={"data": {"type": "x"}})
+    )
+    assert server.verify_lei_online(_TEST_LEI) == {
+        "lei": _TEST_LEI,
+        "legal_name": None,
+        "status": None,
+        "country": None,
+        "registration_status": None,
+        "initial_registration_date": None,
+        "last_update_date": None,
+        "next_renewal_date": None,
+    }
+    respx.get(_GLEIF_URL).mock(return_value=httpx.Response(200, json={}))
+    server._lei_cache.clear()
+    assert server.verify_lei_online(_TEST_LEI)["lei"] == _TEST_LEI
+
+
+@respx.mock
+def test_verify_lei_online_reports_the_registered_lei():
+    """The answer carries the LEI as GLEIF holds it, not as it was asked."""
+    asked = _TEST_LEI.lower()
+    respx.get(server._GLEIF_LEI_RECORD_URL.format(lei=asked)).mock(
+        return_value=httpx.Response(200, json=_CANNED_GLEIF_RESPONSE)
+    )
+    assert server.verify_lei_online(asked)["lei"] == _TEST_LEI
 
 
 # --------------------------------------------------------------------------
@@ -431,3 +498,30 @@ def test_lei_cache_is_bounded():
         server._lei_cache_put(f"LEI{i:017d}", {"lei": str(i)})
     assert len(server._lei_cache) == server._LEI_CACHE_MAX_ENTRIES
     assert "LEI00000000000000000" not in server._lei_cache
+
+
+def test_lei_cache_evicts_by_age_not_by_name(monkeypatch):
+    """Eviction picks the entry that expires first, whatever its key."""
+    now = {"t": 1000.0}
+    monkeypatch.setattr(server.time, "monotonic", lambda: now["t"])
+    server._lei_cache_put("ZZZ", {"lei": "first in"})
+    for i in range(server._LEI_CACHE_MAX_ENTRIES - 1):
+        now["t"] += 1
+        server._lei_cache_put(f"AAA{i:017d}", {"lei": str(i)})
+    now["t"] += 1
+    server._lei_cache_put("MMM", {"lei": "overflow"})
+    assert "ZZZ" not in server._lei_cache
+    assert "AAA00000000000000000" in server._lei_cache
+    assert len(server._lei_cache) == server._LEI_CACHE_MAX_ENTRIES
+
+
+def test_lei_cache_entry_expires_exactly_at_its_deadline(monkeypatch):
+    """An entry is gone the instant its TTL elapses, not a tick later."""
+    now = {"t": 1000.0}
+    monkeypatch.setattr(server.time, "monotonic", lambda: now["t"])
+    server._lei_cache_put("LEI", {"lei": "x"})
+    now["t"] = 1000.0 + server._LEI_CACHE_TTL_SECONDS - 0.001
+    assert server._lei_cache_get("LEI") == {"lei": "x"}
+    now["t"] = 1000.0 + server._LEI_CACHE_TTL_SECONDS
+    assert server._lei_cache_get("LEI") is None
+    assert "LEI" not in server._lei_cache

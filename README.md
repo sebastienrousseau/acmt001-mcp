@@ -29,6 +29,7 @@ identifiers, and generate validated XML, all from your favourite MCP client.
 - [Tools](#tools)
 - [Using the tools](#using-the-tools)
 - [Benchmarks](#benchmarks)
+- [Documentation](#documentation)
 - [Development](#development)
 - [Licence](#licence)
 - [Contribution](#contribution)
@@ -162,7 +163,7 @@ identically to the CLI and REST API.
 
 You can invoke the tools in-process — without a transport — straight through the
 server instance. This mirrors what an agent receives over stdio. The runnable
-version of this snippet lives in [`examples/mcp_tools.py`](examples/mcp_tools.py).
+version of this snippet lives in [`examples/mcp_tools.py`](https://github.com/sebastienrousseau/acmt001-mcp/blob/main/examples/mcp_tools.py).
 
 ```python
 import asyncio
@@ -239,6 +240,16 @@ is why the benchmark prints output size beside the timings: flat bytes
 across growing input is what tells you the rest of the batch was not
 rendered. See [docs/benchmarks.md](docs/benchmarks.md).
 
+## Documentation
+
+- **Rendered docs (API reference, ADRs, benchmarks, changelog):**
+  [sebastienrousseau.github.io/acmt001-mcp](https://sebastienrousseau.github.io/acmt001-mcp/)
+- **Runnable example:** [`examples/mcp_tools.py`](https://github.com/sebastienrousseau/acmt001-mcp/blob/main/examples/mcp_tools.py)
+- **Architecture decisions:** [docs/adr/](docs/adr/index.md)
+- **Release history:** [CHANGELOG.md](https://github.com/sebastienrousseau/acmt001-mcp/blob/main/CHANGELOG.md)
+- **Core library docs:** [acmt001.com](https://acmt001.com)
+- **MCP specification:** [modelcontextprotocol.io](https://modelcontextprotocol.io)
+
 ## Development
 
 **acmt001-mcp** uses [Poetry](https://python-poetry.org/) and
@@ -259,10 +270,17 @@ A `Makefile` orchestrates the quality gates (kept in lockstep with CI):
 
 ```bash
 make check        # all gates (REQUIRED before commit)
-make test         # pytest
+make test         # pytest, 100% line and branch coverage
 make lint         # ruff + black
 make type-check   # mypy --strict
+make doc-coverage # interrogate, 100% docstrings
+make mutate       # mutmut over the tool handlers, gated on the score
+make docs         # Sphinx site, warnings are errors
 ```
+
+The property-based tests (Hypothesis) run as part of `make test`; set
+`HYPOTHESIS_PROFILE=mutation` for the slimmer profile the mutation run
+uses.
 
 ## Related MCP Servers
 

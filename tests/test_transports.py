@@ -13,7 +13,7 @@ from typing import Any
 
 import pytest
 
-from acmt001_mcp import _cli, _transports, server
+from acmt001_mcp import __version__, _cli, _transports, server
 
 
 class _Modern:
@@ -127,3 +127,41 @@ def test_main_defaults_to_stdio(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     server.main([])
     assert calls == [((), {})]
+
+
+def test_run_names_the_transports_it_accepts() -> None:
+    with pytest.raises(ValueError) as info:
+        _transports.run(_Modern(), "carrier-pigeon")
+    assert str(info.value).endswith("choose from stdio, streamable-http, sse")
+
+
+@pytest.mark.parametrize("port", [1, 65535])
+def test_run_accepts_the_edge_ports(port: int) -> None:
+    srv = _Modern()
+    _transports.run(srv, "sse", port=port)
+    assert srv.calls[0][1]["port"] == port
+
+
+@pytest.mark.parametrize("port", [0, 65536, -1])
+def test_run_rejects_ports_outside_the_range(port: int) -> None:
+    with pytest.raises(ValueError, match=f"got {port}$"):
+        _transports.run(_Modern(), "sse", port=port)
+
+
+def test_settings_without_a_host_is_not_the_legacy_sdk() -> None:
+    """Only a settings object that carries ``host`` marks mcp 1.x."""
+    srv = _Modern()
+    srv.settings = argparse.Namespace()  # type: ignore[attr-defined]
+    _transports.run(srv, "sse", "127.0.0.1", 8001)
+    assert not hasattr(srv.settings, "host")
+    assert srv.calls[0][0] == ("sse",)
+    assert srv.calls[0][1]["port"] == 8001
+
+
+def test_main_reports_its_own_name_and_version(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    with pytest.raises(SystemExit) as info:
+        server.main(["--version"])
+    assert info.value.code == 0
+    assert capsys.readouterr().out == f"acmt001-mcp {__version__}\n"
