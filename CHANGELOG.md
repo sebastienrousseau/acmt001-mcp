@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Mutation testing of the tool handlers with mutmut 3, gated in CI by
+  `scripts/mutation_gate.py` (workflow `mutation.yml`). Tools, the prompt
+  and the resources are now registered in one block instead of with
+  decorators, because mutmut never mutates a decorated function; the
+  catalogue a client sees is unchanged.
+- Property-based tests (Hypothesis) over the logic the server owns: the
+  path scrubber is idempotent, every failure is an `{"error": ...}`
+  payload, `validate_records` reports are internally consistent, the
+  describe resource agrees with the tools, the onboarding prompt is a
+  pure function of its arguments, and the LEI cache round-trips copies
+  and never exceeds its bound.
+- A 100% docstring gate (`interrogate`) in the lint job.
+- A rendered documentation site (Sphinx, furo) at
+  <https://sebastienrousseau.github.io/acmt001-mcp/> with the README, the
+  API reference, the benchmarks page, the ADRs, the roadmap and this
+  changelog; built with warnings as errors and deployed from `main`.
+- A test that runs `examples/mcp_tools.py`, so the example cannot rot.
+
 - `--transport streamable-http` and `--transport sse`, with `--host` and
   `--port`. Streamable HTTP serves both current protocol revisions
   (2026-07-28 stateless with `server/discover`, and 2025-11-25 with the

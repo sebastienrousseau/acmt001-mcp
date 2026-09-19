@@ -42,3 +42,6 @@ acmt001_mcp.egg-info/
 
 # Hypothesis example database
 .hypothesis/
+
+# Sphinx build output
+docs/_build/
