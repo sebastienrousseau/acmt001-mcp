@@ -141,7 +141,6 @@ _IdentifierKind = Annotated[
 ]
 
 
-@server.tool(title="List acmt message types", annotations=_PURE_READ)
 def list_message_types() -> list[dict]:
     """List every supported ISO 20022 acmt message type and its human name.
 
@@ -160,7 +159,6 @@ def list_message_types() -> list[dict]:
         return [{"error": str(exc)}]
 
 
-@server.tool(title="Get required fields", annotations=_PURE_READ)
 def get_required_fields(
     message_type: _MessageType,
 ) -> list[str]:
@@ -179,7 +177,6 @@ def get_required_fields(
         return [f"error: {exc}"]
 
 
-@server.tool(title="Get input JSON Schema", annotations=_PURE_READ)
 def get_input_schema(
     message_type: _MessageType,
 ) -> dict:
@@ -199,7 +196,6 @@ def get_input_schema(
         return {"error": str(exc)}
 
 
-@server.tool(title="Validate records against schema", annotations=_PURE_READ)
 def validate_records(
     message_type: _MessageType,
     records: Annotated[
@@ -233,7 +229,6 @@ def validate_records(
         return {"error": str(exc)}
 
 
-@server.tool(title="Validate IBAN, BIC or LEI", annotations=_PURE_READ)
 def validate_identifier(
     kind: _IdentifierKind,
     value: Annotated[
@@ -264,7 +259,6 @@ def validate_identifier(
         return {"error": str(exc)}
 
 
-@server.tool(title="Generate acmt XML from records", annotations=_PURE_READ)
 def generate_message(
     message_type: _MessageType,
     records: Annotated[
@@ -340,10 +334,6 @@ def _lei_cache_put(lei_code: str, answer: dict) -> dict:
     return dict(answer)
 
 
-@server.tool(
-    title="Verify a LEI against the live GLEIF register",
-    annotations=_EXTERNAL,
-)
 def verify_lei_online(
     lei_code: Annotated[
         str,
@@ -439,7 +429,6 @@ def verify_lei_online(
 # for onboarding a corporate account. Like the tools, it is a pure function of
 # its arguments -- it renders guidance text and never touches the backend.
 # ---------------------------------------------------------------------------
-@server.prompt(title="Onboard a corporate account")
 def onboard_corporate_account(
     company_name: Annotated[
         str,
@@ -500,11 +489,6 @@ def onboard_corporate_account(
 # input record. Both return a ``json.dumps`` string, mirroring the tools'
 # JSON-serializable contract.
 # ---------------------------------------------------------------------------
-@server.resource(
-    "acmt001://message-types",
-    title="acmt message type catalogue",
-    mime_type="application/json",
-)
 def message_types_resource() -> str:
     """Expose the full acmt message type catalogue as a JSON resource.
 
@@ -518,11 +502,6 @@ def message_types_resource() -> str:
     return json.dumps(services.list_message_types())
 
 
-@server.resource(
-    "acmt001://describe/{message_type}",
-    title="Describe an acmt message type",
-    mime_type="application/json",
-)
 def describe_message_type_resource(message_type: _MessageType) -> str:
     """Describe a single acmt message type's input record as a JSON resource.
 
@@ -549,6 +528,46 @@ def describe_message_type_resource(message_type: _MessageType) -> str:
         )
     except ValueError as exc:
         return json.dumps({"error": str(exc)})
+
+
+# Tools, the prompt and the resources are registered here, in definition
+# order, rather than with decorators on each function: mutmut 3 never
+# mutates a decorated function, so the decorator form left every handler
+# outside mutation testing. The registered object is the same function,
+# docstring and signature, and clients list the tools in this order.
+server.tool(title="List acmt message types", annotations=_PURE_READ)(
+    list_message_types
+)
+server.tool(title="Get required fields", annotations=_PURE_READ)(
+    get_required_fields
+)
+server.tool(title="Get input JSON Schema", annotations=_PURE_READ)(
+    get_input_schema
+)
+server.tool(title="Validate records against schema", annotations=_PURE_READ)(
+    validate_records
+)
+server.tool(title="Validate IBAN, BIC or LEI", annotations=_PURE_READ)(
+    validate_identifier
+)
+server.tool(title="Generate acmt XML from records", annotations=_PURE_READ)(
+    generate_message
+)
+server.tool(
+    title="Verify a LEI against the live GLEIF register",
+    annotations=_EXTERNAL,
+)(verify_lei_online)
+server.prompt(title="Onboard a corporate account")(onboard_corporate_account)
+server.resource(
+    "acmt001://message-types",
+    title="acmt message type catalogue",
+    mime_type="application/json",
+)(message_types_resource)
+server.resource(
+    "acmt001://describe/{message_type}",
+    title="Describe an acmt message type",
+    mime_type="application/json",
+)(describe_message_type_resource)
 
 
 def main(argv: list[str] | None = None) -> None:
