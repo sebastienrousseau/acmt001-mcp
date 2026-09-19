@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+cff-version: 1.2.0
+message: "If you use acmt001-mcp in research or production write-ups, please cite it as below."
+type: software
+title: "acmt001-mcp: Model Context Protocol server for ISO 20022 account management"
+abstract: >-
+  A Model Context Protocol server exposing the acmt001 library to AI agents:
+  seven tools for discovering ISO 20022 acmt message types, validating
+  records and identifiers, looking up LEIs and generating validated
+  account management XML.
+authors:
+  - family-names: Rousseau
+    given-names: Sebastien
+    email: sebastian.rousseau@gmail.com
+version: "0.0.9"
+date-released: "2026-08-29"
+license: "Apache-2.0 OR MIT"
+repository-code: "https://github.com/sebastienrousseau/acmt001-mcp"
+url: "https://acmt001.com"
+keywords:
+  - ISO 20022
+  - acmt
+  - account management
+  - Model Context Protocol
+  - MCP
+  - AI agents
+  - banking
