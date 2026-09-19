@@ -16,8 +16,8 @@ ISO 20022 Account Management library as tools for AI agents and assistants** —
 discover message types, inspect input schemas, validate records and financial
 identifiers, and generate validated XML, all from your favourite MCP client.
 
-> **Latest release: v0.0.9** — 7 MCP tools over stdio, all backed by the
-> shared `acmt001.services` layer, for Python 3.10+.
+> **Latest release: v0.0.9** — 7 MCP tools over stdio, streamable HTTP or
+> SSE, all backed by the shared `acmt001.services` layer, for Python 3.10+.
 > [See what's new →][release-005]
 
 ## Contents
@@ -25,6 +25,7 @@ identifiers, and generate validated XML, all from your favourite MCP client.
 - [Overview](#overview)
 - [Install](#install)
 - [Quick Start](#quick-start)
+- [Transports](#transports)
 - [Tools](#tools)
 - [Using the tools](#using-the-tools)
 - [Benchmarks](#benchmarks)
@@ -98,7 +99,7 @@ python -m pip install -U acmt001-mcp
 
 ## Quick Start
 
-Launch the server over stdio (the SDK's default transport):
+Launch the server over stdio (the default transport):
 
 ```sh
 acmt001-mcp
@@ -118,6 +119,32 @@ client's configuration:
 The agent can then call the tools below to validate account data and generate
 ISO 20022 messages on demand.
 
+## Transports
+
+One command line, three transports:
+
+| Command | Transport | Endpoint | Protocol revisions |
+| :--- | :--- | :--- | :--- |
+| `acmt001-mcp` | stdio | the client spawns the process | 2026-07-28, 2025-11-25 |
+| `acmt001-mcp --transport streamable-http` | Streamable HTTP | `http://127.0.0.1:8000/mcp` | 2026-07-28 (stateless, `server/discover`) and 2025-11-25 (`initialize`, `Mcp-Session-Id`) on the same endpoint; responses stream as server-sent events, `GET` opens the server-to-client stream |
+| `acmt001-mcp --transport sse` | HTTP+SSE (2024-11-05) | `http://127.0.0.1:8000/sse` and `/messages/` | for clients that still expect the older transport |
+
+`--host` and `--port` change the bind address (defaults `127.0.0.1` and
+`8000`). The HTTP transports carry no authentication of their own: bind
+loopback, or put the server behind a gateway you trust before binding a
+routable address. Every release is verified over streamable HTTP with
+[scout](https://github.com/sebastienrousseau/scout) in both protocol
+eras and over SSE with the MCP SDK client; see
+[ADR 0001](docs/adr/0001-three-transports-one-command-line.md).
+
+```json
+{
+  "mcpServers": {
+    "acmt001": { "url": "http://127.0.0.1:8000/mcp" }
+  }
+}
+```
+
 ## Tools
 
 All tools delegate to the shared `acmt001.services` layer, so they behave
@@ -129,6 +156,7 @@ identically to the CLI and REST API.
 - `validate_records` — Validate flat records against a message type
 - `validate_identifier` — Validate an IBAN, BIC, or LEI
 - `generate_message` — Generate a validated acmt XML message
+- `verify_lei_online` — Look an LEI up in the live GLEIF register (needs the `online` extra)
 
 ## Using the tools
 
