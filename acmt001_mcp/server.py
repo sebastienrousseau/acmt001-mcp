@@ -46,7 +46,7 @@ Launching the server:
           }
         }
 
-The server communicates over stdio (FastMCP's default transport).
+The server communicates over stdio (the SDK's default transport).
 """
 
 import json
@@ -54,17 +54,15 @@ from typing import Annotated
 
 from acmt001 import services
 from acmt001.constants import valid_xml_types
-from mcp.server.fastmcp import FastMCP
 from mcp.types import ToolAnnotations
 from pydantic import Field
 
 from acmt001_mcp import __version__
+from acmt001_mcp._mcp_compat import build_server
 
-server = FastMCP("acmt001")
-# FastMCP does not expose a version kwarg; without this override the
-# MCP SDK's own version leaks into serverInfo.version, breaking
-# manifest/runtime coherence checks (e.g. Glama scoring).
-server._mcp_server.version = __version__
+# The shim picks FastMCP (mcp 1.x) or MCPServer (mcp 2.x) and reports
+# the package version in serverInfo either way.
+server = build_server("acmt001", __version__)
 
 # Shared MCP tool annotations. Every tool in this server is a pure,
 # side-effect-free reader over the acmt001 ``services`` facade: each tool
@@ -76,7 +74,7 @@ server._mcp_server.version = __version__
 #
 # These hints let MCP clients (and the Glama quality grader) reason about
 # safety, caching, and auto-approval without executing the tool.
-_PURE_READ = ToolAnnotations(
+_PURE_READ = ToolAnnotations(  # type: ignore[call-arg]
     readOnlyHint=True,
     destructiveHint=False,
     idempotentHint=True,
@@ -88,7 +86,7 @@ _PURE_READ = ToolAnnotations(
 # public GLEIF LEI register, so it is open-world (``openWorldHint=True``). It is
 # still a non-destructive, idempotent read: it never mutates remote state, and
 # the same LEI yields the same record barring an upstream data change.
-_EXTERNAL = ToolAnnotations(
+_EXTERNAL = ToolAnnotations(  # type: ignore[call-arg]
     readOnlyHint=True,
     destructiveHint=False,
     idempotentHint=True,

@@ -20,7 +20,7 @@ python = ">=3.10,<4.0"
 # floor below unresolvable against them. 0.0.4 is the first release
 # that admits the patched cryptography.
 acmt001 = ">=0.0.5"
-mcp = ">=1.2,<2"
+mcp = ">=1.2,<3"
 # Optional HTTP client for the live GLEIF lookup (verify_lei_online); only
 # installed with the ``online`` extra so the base install stays network-free.
 httpx = { version = ">=0.27,<1", optional = true }
@@ -121,6 +121,12 @@ exclude = [
     ".venv/",
     ".eggs/",
 ]
+
+# The server object comes from the SDK-compat shim, so its decorators
+# are untyped from mypy's point of view on either major.
+[[tool.mypy.overrides]]
+module = "acmt001_mcp.server"
+disallow_untyped_decorators = false
 
 [[tool.mypy.overrides]]
 module = "mcp.*"

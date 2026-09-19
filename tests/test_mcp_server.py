@@ -25,8 +25,7 @@ import respx
 
 pytest.importorskip("mcp")
 
-from mcp.server.fastmcp import FastMCP  # noqa: E402
-
+import acmt001_mcp._mcp_compat as compat  # noqa: E402
 import acmt001_mcp.server as server  # noqa: E402
 
 EXPECTED_TOOLS = {
@@ -84,7 +83,8 @@ def _tool_input_schema(name: str) -> dict:
     """Return the JSON input schema a client sees for the named tool."""
     for tool in asyncio.run(server.server.list_tools()):
         if tool.name == name:
-            return tool.inputSchema
+            # snake_case on mcp 2.x, camelCase on 1.x
+            return getattr(tool, "input_schema", None) or tool.inputSchema
     raise AssertionError(f"tool not registered: {name}")
 
 
@@ -103,7 +103,7 @@ def test_identifier_kind_param_exposes_enum():
 
 def test_server_and_main_are_well_formed():
     """The module exposes a FastMCP server and a callable ``main``."""
-    assert isinstance(server.server, FastMCP)
+    assert isinstance(server.server, compat.MCPServer)
     assert callable(server.main)
 
 
@@ -283,13 +283,10 @@ def test_call_tool_through_fastmcp(sample_record):
         result = await server.server.call_tool(
             "validate_identifier", {"kind": "bic", "value": "NWBKGB2LXXX"}
         )
-        # call_tool returns a sequence of content blocks; extract the text.
-        block = result[0] if isinstance(result, list | tuple) else result
-        text = getattr(block, "text", None)
-        if text is None and isinstance(result, tuple):
-            # Newer FastMCP returns (content, structured) tuples.
-            text = json.dumps(result[1])
-        return json.loads(text)
+        structured = compat.result_structured(result)
+        if structured is not None:
+            return structured
+        return json.loads(compat.result_content(result)[0].text)
 
     payload = asyncio.run(go())
     assert payload["valid"] is True
@@ -297,8 +294,11 @@ def test_call_tool_through_fastmcp(sample_record):
 
 def test_verify_lei_online_is_open_world():
     """The GLEIF lookup tool is annotated open-world, unlike the pure readers."""
-    assert server._EXTERNAL.openWorldHint is True
-    assert server._PURE_READ.openWorldHint is False
+    # by_alias gives the wire (camelCase) names on both SDK majors
+    assert server._EXTERNAL.model_dump(by_alias=True)["openWorldHint"] is True
+    assert (
+        server._PURE_READ.model_dump(by_alias=True)["openWorldHint"] is False
+    )
 
 
 @respx.mock
