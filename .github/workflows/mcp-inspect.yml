@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   inspect:
-    name: MCP Inspector (tools/list over stdio, streamable HTTP and SSE)
+    name: MCP Inspector (tools/list)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
