@@ -39,3 +39,6 @@ tmp/
 .mypy_cache/
 .ruff_cache/
 acmt001_mcp.egg-info/
+
+# Hypothesis example database
+.hypothesis/
