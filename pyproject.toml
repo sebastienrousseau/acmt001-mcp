@@ -53,7 +53,7 @@ furo = ">=2024.1"
 myst-parser = { version = ">=3,<5", extras = ["linkify"] }
 sphinx-autodoc-typehints = ">=2,<4"
 sphinx-copybutton = ">=0.5,<1"
-sphinxcontrib-mermaid = ">=0.9,<2"
+sphinxcontrib-mermaid = ">=0.9,<3"
 
 [tool.poetry.urls]
 Documentation = "https://sebastienrousseau.github.io/acmt001-mcp/"
