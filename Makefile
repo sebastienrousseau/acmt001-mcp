@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format type-check security clean examples doc-coverage mutate docs check
+.PHONY: help install dev test lint format type-check security clean examples doc-coverage mutate docs demo check
 
 # Mutation score floor for the tool handlers: 99.3% (302 of 304) on
 # 2026-09-19; the two survivors only change the case of an HTTP header
@@ -66,5 +66,8 @@ mutate: ## Mutation testing over the tool handlers (mutmut 3, config in pyprojec
 
 docs: ## Build the Sphinx site into docs/_build/html (warnings are errors)
 	$(POETRY) run sphinx-build -W --keep-going -b html docs docs/_build/html
+
+demo: ## Render the README demo GIF with VHS
+	vhs .github/demo.tape
 
 check: lint type-check test doc-coverage examples ## Run all gates
