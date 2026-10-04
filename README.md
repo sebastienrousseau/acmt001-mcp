@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: Apache-2.0 OR MIT -->
+
 # acmt001-mcp: An MCP Server for ISO 20022 Account Management
 
 ![acmt001-mcp banner][banner]
