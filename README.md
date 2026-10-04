@@ -39,7 +39,7 @@ identifiers, and generate validated XML, all from your favourite MCP client.
 - [Benchmarks](#benchmarks)
 - [Documentation](#documentation)
 - [Development](#development)
-- [Licence](#licence)
+- [License](#license)
 - [Contribution](#contribution)
 - [Acknowledgements](#acknowledgements)
 
