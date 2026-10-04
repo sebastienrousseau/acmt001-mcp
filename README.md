@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: Apache-2.0 OR MIT -->
+
 # acmt001-mcp: An MCP Server for ISO 20022 Account Management
 
 ![acmt001-mcp banner][banner]
@@ -16,9 +18,15 @@ ISO 20022 Account Management library as tools for AI agents and assistants** —
 discover message types, inspect input schemas, validate records and financial
 identifiers, and generate validated XML, all from your favourite MCP client.
 
-> **Latest release: v0.0.9** — 7 MCP tools over stdio, streamable HTTP or
+> **Latest release: v0.0.10** — 7 MCP tools over stdio, streamable HTTP or
 > SSE, all backed by the shared `acmt001.services` layer, for Python 3.10+.
 > [See what's new →][release-005]
+
+<p align="center">
+  <img src=".github/demo.gif" alt="acmt001-mcp Demo" width="100%" />
+</p>
+
+---
 
 ## Contents
 

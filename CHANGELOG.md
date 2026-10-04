@@ -5,10 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.0.10] - 2026-10-03
 
 ### Added
 
+- Framework adapter module (`acmt001_mcp.adapters`) exporting acmt tools
+  for LangChain, CrewAI, and LlamaIndex agents.
+- Animated terminal `demo.gif` rendered via VHS from `.github/demo.tape`.
+- `AGENTS.md` defining AI collaboration invariants and verification gates.
+- SPDX Apache-2.0 OR MIT dual license compliance with `LICENSES/` tree.
 - Mutation testing of the tool handlers with mutmut 3, gated in CI by
   `scripts/mutation_gate.py` (workflow `mutation.yml`). Tools, the prompt
   and the resources are now registered in one block instead of with
