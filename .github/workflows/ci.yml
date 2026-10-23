@@ -67,10 +67,10 @@ jobs:
           pip install --no-deps -e .
 
       - name: Ruff check
-        run: ruff check acmt001_mcp/ benches/ scripts/
+        run: ruff check acmt001_mcp/ tests/ benches/ scripts/ fuzz/
 
       - name: Black check
-        run: black --check acmt001_mcp/ tests/ benches/ scripts/
+        run: black --check acmt001_mcp/ tests/ benches/ scripts/ fuzz/
 
       - name: Mypy
         run: mypy acmt001_mcp/

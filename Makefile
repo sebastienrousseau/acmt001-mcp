@@ -24,12 +24,12 @@ test: ## Run tests
 	$(POETRY) run pytest tests/ -v
 
 lint: ## Run linters (ruff + black check)
-	$(POETRY) run ruff check acmt001_mcp/ tests/
-	$(POETRY) run black --check acmt001_mcp/ tests/
+	$(POETRY) run ruff check acmt001_mcp/ tests/ benches/ scripts/ fuzz/
+	$(POETRY) run black --check acmt001_mcp/ tests/ benches/ scripts/ fuzz/
 
 format: ## Auto-format code (ruff fix + black)
-	$(POETRY) run ruff check --fix acmt001_mcp/ tests/
-	$(POETRY) run black acmt001_mcp/ tests/
+	$(POETRY) run ruff check --fix acmt001_mcp/ tests/ benches/ scripts/ fuzz/
+	$(POETRY) run black acmt001_mcp/ tests/ benches/ scripts/ fuzz/
 
 type-check: ## Run mypy type checking
 	$(POETRY) run mypy acmt001_mcp/
