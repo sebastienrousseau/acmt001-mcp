@@ -288,10 +288,10 @@ def generate_message(
     """
     try:
         return services.generate(message_type, records)
-    except (ValueError, RuntimeError) as exc:
+    except (ValueError, RuntimeError, OverflowError) as exc:
         # The library raises RuntimeError when the rendered XML fails its
-        # XSD; to the caller that is a validation error like any other,
-        # and the SDK would otherwise hide the reason behind a bare
+        # XSD (OverflowError for a year its date types cannot hold); either is
+        # a validation error, which the SDK would otherwise hide behind a bare
         # "Error executing tool". The schema's install path is noise.
         return json.dumps({"error": _without_paths(str(exc))})
 

@@ -25,6 +25,10 @@ reads at import, so a fresh `pip install acmt001-mcp` failed to start.
 
 ### Fixed
 
+- `generate_message` answers a record whose date has a year the XSD date
+  types cannot hold (`222222222026-01-15T10:30:00`) with an `{"error": ...}`
+  payload. The schema check raised `OverflowError` out of the tool;
+  found by the new Atheris harness, and present in 0.0.11 too.
 - `scripts/check_suite_consistency.py` compares this tree with the
   published `acmt001-mcp`, not with the `acmt001` core it was copied
   from, so the scheduled Suite Consistency job no longer reports a
