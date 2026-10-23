@@ -5,7 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.12] - 2026-10-23
+## [0.0.13] - 2026-10-23
+
+Ships in lockstep with `acmt001` 0.0.13. The core's 0.0.12 is yanked:
+it moved `services._IDENTIFIER_VALIDATORS`, which this server's 0.0.11
+reads at import, so a fresh `pip install acmt001-mcp` failed to start.
+`acmt001` 0.0.13 restores the name; this server never shipped 0.0.12.
 
 ### Security
 
@@ -44,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Requires `acmt001 >= 0.0.12, < 1`: the suite releases in lockstep.
+- Requires `acmt001 >= 0.0.13, < 1`: the suite releases in lockstep.
 - Every `pip install` in CI, the docs build and the container image is
   hash-pinned: `requirements/ci.txt`, `docs.txt`, `fuzz.txt` and
   `docker.txt`, with the package installed `--no-deps` on top.
