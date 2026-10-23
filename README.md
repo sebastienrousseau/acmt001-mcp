@@ -9,9 +9,10 @@
   <a href="https://pypi.org/project/acmt001-mcp/"><img src="https://img.shields.io/pypi/v/acmt001-mcp?style=for-the-badge&color=fc8d62&logo=python" alt="Registry" height="28" /></a>
   <a href="https://sebastienrousseau.github.io/acmt001-mcp/"><img src="https://img.shields.io/badge/docs-site-blue?style=for-the-badge&labelColor=555555&logo=readthedocs" alt="Docs" height="28" /></a>
   <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/acmt001-mcp"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/acmt001-mcp?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" height="28" /></a>
+  <a href="https://www.bestpractices.dev/projects/15827"><img src="https://img.shields.io/cii/level/15827?style=for-the-badge&label=OpenSSF%20Best%20Practices&logo=openssf" alt="OpenSSF Best Practices" height="28" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg?style=for-the-badge" alt="License: Apache-2.0 OR MIT" height="28" /></a>
   <a href="https://github.com/sebastienrousseau/acmt001-mcp/blob/main/docs/POLICIES.md"><img src="https://img.shields.io/badge/Python-3.10%2B-93450a.svg?style=for-the-badge&logo=python" alt="Python 3.10 or newer" height="28" /></a>
-  <a href="https://glama.ai/mcp/servers/sebastienrousseau/acmt001-mcp"><img src="https://glama.ai/mcp/servers/sebastienrousseau/acmt001-mcp/badges/score.svg" alt="Glama MCP score" height="28" /></a>
+  <a href="https://glama.ai/mcp/servers/sebastienrousseau/acmt001-mcp"><img src="https://img.shields.io/badge/Glama-MCP%20server-6c5ce7?style=for-the-badge" alt="Glama MCP server listing" height="28" /></a>
 </p>
 
 **A [Model Context Protocol][mcp] server that exposes the [`acmt001`][core]
