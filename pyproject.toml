@@ -16,10 +16,11 @@ acmt001-mcp = "acmt001_mcp.server:main"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-# 0.0.2 and 0.0.3 both cap cryptography<50.0.0, which makes the
-# floor below unresolvable against them. 0.0.4 is the first release
-# that admits the patched cryptography.
-acmt001 = ">=0.0.5"
+# The suite releases in lockstep: this server ships against the core
+# at its own version. (0.0.2 and 0.0.3 also capped cryptography<50.0.0,
+# which the floor below rules out.) requirements/*.in hold the
+# published 0.0.9 until acmt001 0.0.12 reaches PyPI.
+acmt001 = ">=0.0.12,<1"
 # mcp < 1.30.0 and 2.0.x/2.1.x are affected by GHSA-84m7-p3x7-pcfv
 # (unbounded streamable HTTP session accumulation; this server serves
 # streamable HTTP), so no affected release can resolve.
