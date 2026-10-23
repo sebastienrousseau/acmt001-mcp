@@ -14,17 +14,18 @@ ENV PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # pyproject.toml carries ``readme = "README.md"``, so README.md must be
-# present at build-time for ``pip install .`` to resolve the package
+# present at build-time for the package install to resolve the package
 # metadata.
 COPY pyproject.toml README.md ./
 COPY requirements/docker.txt ./requirements/docker.txt
 COPY acmt001_mcp ./acmt001_mcp
 
-# Install the hash-pinned runtime dependencies, then layer this package on
-# top with --no-deps, inside a self-contained virtualenv.
+# Install the hash-pinned runtime dependencies (poetry-core among them, the
+# build backend), then layer this package on top with --no-deps and
+# --no-build-isolation, inside a self-contained virtualenv.
 RUN python -m venv /opt/venv \
     && /opt/venv/bin/pip install --require-hashes -r requirements/docker.txt \
-    && /opt/venv/bin/pip install --no-deps .
+    && /opt/venv/bin/pip install --no-deps --no-build-isolation .
 
 
 FROM python:3.14-slim@sha256:0514bc76712d64f8bb48adcb95b1ab0d88c69fee95d62fe4c18ee948bee9b1e1

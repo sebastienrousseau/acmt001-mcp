@@ -34,7 +34,7 @@ jobs:
       - name: Install this package
         run: |
           pip install --require-hashes -r requirements/ci.txt
-          pip install --no-deps -e .
+          pip install --no-deps --no-build-isolation -e .
 
       - name: Run tests
         run: pytest tests/ -v --tb=short
@@ -64,7 +64,7 @@ jobs:
       - name: Install this package
         run: |
           pip install --require-hashes -r requirements/ci.txt
-          pip install --no-deps -e .
+          pip install --no-deps --no-build-isolation -e .
 
       - name: Ruff check
         run: ruff check acmt001_mcp/ tests/ benches/ scripts/ fuzz/
