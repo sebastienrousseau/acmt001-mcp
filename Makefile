@@ -1,4 +1,4 @@
-.PHONY: help install dev test lint format type-check security clean examples doc-coverage mutate docs demo check
+.PHONY: help install dev test lint format type-check security clean examples doc-coverage complexity mutate docs demo check
 
 # Mutation score floor for the tool handlers: 99.3% (302 of 304) on
 # 2026-09-19; the two survivors only change the case of an HTTP header
@@ -24,12 +24,12 @@ test: ## Run tests
 	$(POETRY) run pytest tests/ -v
 
 lint: ## Run linters (ruff + black check)
-	$(POETRY) run ruff check acmt001_mcp/ tests/
-	$(POETRY) run black --check acmt001_mcp/ tests/
+	$(POETRY) run ruff check acmt001_mcp/ tests/ benches/ scripts/ fuzz/
+	$(POETRY) run black --check acmt001_mcp/ tests/ benches/ scripts/ fuzz/
 
 format: ## Auto-format code (ruff fix + black)
-	$(POETRY) run ruff check --fix acmt001_mcp/ tests/
-	$(POETRY) run black acmt001_mcp/ tests/
+	$(POETRY) run ruff check --fix acmt001_mcp/ tests/ benches/ scripts/ fuzz/
+	$(POETRY) run black acmt001_mcp/ tests/ benches/ scripts/ fuzz/
 
 type-check: ## Run mypy type checking
 	$(POETRY) run mypy acmt001_mcp/
@@ -51,6 +51,12 @@ examples: ## Verify example scripts run
 doc-coverage: ## Enforce the 100% docstring coverage gate
 	$(POETRY) run interrogate -c pyproject.toml -v acmt001_mcp
 
+# Both baselines (BASELINE in the script, complexipy-snapshot.json) may
+# only shrink; CI runs the same two commands in the lint job.
+complexity: ## Complexity gate (cyclomatic, Halstead, length, cognitive)
+	$(POETRY) run python scripts/check_complexity.py
+	$(POETRY) run complexipy acmt001_mcp scripts benches examples fuzz tests --max-complexity-allowed 15 --quiet
+
 # macOS: urllib's proxy lookup (_scproxy) crashes in a forked child, and
 # mutmut runs every mutant in one, so the GLEIF tests would die with
 # SIGSEGV and drop out of the score. A proxy in the environment makes
@@ -70,4 +76,4 @@ docs: ## Build the Sphinx site into docs/_build/html (warnings are errors)
 demo: ## Render the README demo GIF with VHS
 	vhs .github/demo.tape
 
-check: lint type-check test doc-coverage examples ## Run all gates
+check: lint type-check test doc-coverage complexity examples ## Run all gates

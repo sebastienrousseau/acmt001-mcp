@@ -4,23 +4,26 @@
 
 ![acmt001-mcp banner][banner]
 
-[![PyPI Version][pypi-badge]][07]
-[![Python Versions][python-versions-badge]][07]
-[![PyPI Downloads][pypi-downloads-badge]][07]
-[![Licence][licence-badge]][01]
-[![Tests][tests-badge]][tests-url]
-[![Quality][quality-badge]][quality-url]
-[![Documentation][docs-badge]][docs-url]
-[![Glama MCP server score][glama-badge]][glama-url]
+<p align="center">
+  <a href="https://github.com/sebastienrousseau/acmt001-mcp/actions"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/acmt001-mcp/ci.yml?style=for-the-badge&logo=github" alt="Build" height="28" /></a>
+  <a href="https://pypi.org/project/acmt001-mcp/"><img src="https://img.shields.io/pypi/v/acmt001-mcp?style=for-the-badge&color=fc8d62&logo=python" alt="Registry" height="28" /></a>
+  <a href="https://sebastienrousseau.github.io/acmt001-mcp/"><img src="https://img.shields.io/badge/docs-site-blue?style=for-the-badge&labelColor=555555&logo=readthedocs" alt="Docs" height="28" /></a>
+  <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/acmt001-mcp"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/acmt001-mcp?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" height="28" /></a>
+  <a href="https://www.bestpractices.dev/projects/15827"><img src="https://img.shields.io/cii/level/15827?style=for-the-badge&label=OpenSSF%20Best%20Practices&logo=openssf" alt="OpenSSF Best Practices" height="28" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg?style=for-the-badge" alt="License: Apache-2.0 OR MIT" height="28" /></a>
+  <a href="https://github.com/sebastienrousseau/acmt001-mcp/blob/main/docs/POLICIES.md"><img src="https://img.shields.io/badge/Python-3.10%2B-93450a.svg?style=for-the-badge&logo=python" alt="Python 3.10 or newer" height="28" /></a>
+  <a href="https://glama.ai/mcp/servers/sebastienrousseau/acmt001-mcp"><img src="https://img.shields.io/badge/Glama-MCP%20server-6c5ce7?style=for-the-badge" alt="Glama MCP server listing" height="28" /></a>
+</p>
 
 **A [Model Context Protocol][mcp] server that exposes the [`acmt001`][core]
 ISO 20022 Account Management library as tools for AI agents and assistants** —
 discover message types, inspect input schemas, validate records and financial
 identifiers, and generate validated XML, all from your favourite MCP client.
 
-> **Latest release: v0.0.11**: 7 MCP tools over stdio, streamable HTTP or
+> **Latest release: v0.0.13**: 7 MCP tools over stdio, streamable HTTP or
 > SSE, all backed by the shared `acmt001.services` layer, for Python 3.10+.
-> [See what's new →][release-005]
+> Ships in lockstep with `acmt001` 0.0.13; every CI and image install is
+> hash-pinned, and the tools are fuzzed. [See what's new →][release-0013]
 
 <p align="center">
   <img src=".github/demo.gif" alt="acmt001-mcp Demo" width="100%" />
@@ -328,23 +331,11 @@ Built on the [`acmt001`][core] ISO 20022 Account Management library and the
 [01]: https://opensource.org/license/apache-2-0/
 [04]: https://github.com/sebastienrousseau/acmt001-mcp/blob/main/CONTRIBUTING.md
 [05]: https://github.com/sebastienrousseau/acmt001-mcp/graphs/contributors
-[07]: https://pypi.org/project/acmt001-mcp/
 [core]: https://github.com/sebastienrousseau/acmt001
 [lsp]: https://github.com/sebastienrousseau/acmt001-lsp
 [mcp]: https://modelcontextprotocol.io
+[release-0013]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.13
 [release-005]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.5
 [release-002]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.2
 [release-001]: https://github.com/sebastienrousseau/acmt001-mcp/releases/tag/v0.0.1
 [banner]: https://kura.pro/acmt001-mcp/images/banners/banner-acmt001-mcp.svg 'acmt001-mcp'
-[docs-badge]: https://img.shields.io/badge/Docs-acmt001.com-blue?style=for-the-badge
-[docs-url]: https://acmt001.com/
-[licence-badge]: https://img.shields.io/pypi/l/acmt001-mcp?style=for-the-badge
-[pypi-badge]: https://img.shields.io/pypi/v/acmt001-mcp?style=for-the-badge
-[pypi-downloads-badge]: https://img.shields.io/pypi/dm/acmt001-mcp.svg?style=for-the-badge
-[python-versions-badge]: https://img.shields.io/pypi/pyversions/acmt001-mcp.svg?style=for-the-badge
-[quality-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/acmt001-mcp/ci.yml?branch=main&label=Quality&style=for-the-badge
-[quality-url]: https://github.com/sebastienrousseau/acmt001-mcp/actions/workflows/ci.yml
-[tests-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/acmt001-mcp/ci.yml?branch=main&label=Tests&style=for-the-badge
-[tests-url]: https://github.com/sebastienrousseau/acmt001-mcp/actions/workflows/ci.yml
-[glama-badge]: https://glama.ai/mcp/servers/sebastienrousseau/acmt001-mcp/badges/score.svg
-[glama-url]: https://glama.ai/mcp/servers/sebastienrousseau/acmt001-mcp
