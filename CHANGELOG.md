@@ -5,6 +5,67 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.12] - 2026-10-23
+
+### Security
+
+- `mcp` is constrained to `>=1.30.0,!=2.0.*,!=2.1.*,<3`, so no release
+  affected by GHSA-84m7-p3x7-pcfv (unbounded streamable HTTP session
+  accumulation: mcp `>=1.8.0,<1.30.0` and `>=2.0.0,<2.2.0`) can resolve.
+  The previous `>=1.2,<3` admitted them.
+- Security floors on mcp's transitive stack, matching pacs008-mcp:
+  `anyio >= 4.14.2`, `httpx2 >= 2.12.0`, `httpcore2 >= 2.10.0`,
+  `pyjwt[crypto] >= 2.15.0`, `opentelemetry-api >= 1.45.1`
+  (GHSA-xcq7-p3pf-p88h) and `certifi >= 2026.10.19` (PYSEC-2026-4320).
+
+### Fixed
+
+- `scripts/check_suite_consistency.py` compares this tree with the
+  published `acmt001-mcp`, not with the `acmt001` core it was copied
+  from, so the scheduled Suite Consistency job no longer reports a
+  never-released bump that does not exist. It still reports, correctly,
+  any member that leads or lags the core.
+
+### Added
+
+- Coverage-guided fuzzing: `fuzz/fuzz_tools.py` (Atheris) feeds arbitrary
+  text to `validate_identifier`, the message-type lookups, the
+  onboarding prompt, `validate_records` and `generate_message`, run by
+  the `Fuzz` workflow on every change and for 30 minutes weekly;
+  `tests/test_untrusted_text.py` holds the fixed and property-based
+  cases of the same contract, including that markup in a record value
+  never becomes an element.
+- A complexity gate in the lint job and `make check`:
+  `scripts/check_complexity.py` (cyclomatic, Halstead, function and file
+  length) and `complexipy` (cognitive), each against a committed
+  baseline of the offenders that predate it, which may only shrink.
+- `docs/POLICIES.md`, the toolchain policy the README's Python badge
+  links to.
+
+### Changed
+
+- Requires `acmt001 >= 0.0.12, < 1`: the suite releases in lockstep.
+- Every `pip install` in CI, the docs build and the container image is
+  hash-pinned: `requirements/ci.txt`, `docs.txt`, `fuzz.txt` and
+  `docker.txt`, with the package installed `--no-deps` on top.
+- The container image runs Python 3.14 (`python:3.14-slim`, pinned by
+  digest) and drops the `ACMT001_PIP_SPEC` build argument and the git
+  client it needed; the runtime dependencies come from
+  `requirements/docker.txt`.
+- GitHub Actions updated and pinned by commit SHA: checkout 7.0.1,
+  setup-python 7.0.0, setup-node 7.1.0, upload-artifact 7.0.2,
+  attest-build-provenance 4.2.2, gh-action-pypi-publish 1.14.2,
+  sbom-action 0.24.3, scorecard-action 2.5.0, codeql-action 4.39.0.
+- Development tools: ruff `>=0.1,<0.18`, mypy `>=1.11,<3.0`; the release
+  tooling floors `virtualenv>=21.14.8` and `certifi>=2026.10.19`.
+- The README badge row follows the portfolio template: Build, Registry,
+  Docs, OpenSSF Scorecard, OpenSSF Best Practices, License, Python floor
+  and Glama, every badge a 28 px shields.io image.
+- `scripts/verify_versions.py` checks each manifest in its own helper; the
+  output and exit codes are unchanged.
+- `CITATION.cff` and `SECURITY.md` carry the current version again (they
+  had been left at 0.0.10 and 0.0.9).
+
 ## [0.0.11] - 2026-10-04
 
 ### Changed
