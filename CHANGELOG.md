@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+
+- The release SBOMs (CycloneDX and the pip-licenses manifest) describe
+  the shipped runtime set: the hash-pinned `requirements/docker.txt` the
+  image installs, plus the package as a local wheel, in a venv of their
+  own. `poetry install` had resolved afresh (no `poetry.lock` is
+  committed here), and `poetry run` pointed the SBOM tools at their own
+  interpreter, so the SBOM listed the tooling, not the runtime set.
+- The MCP Inspector conformance job pins `@modelcontextprotocol/inspector`
+  to 2.10.1, so a new npm publish cannot change what CI runs.
+
 ## [0.0.13] - 2026-10-23
 
 Ships in lockstep with `acmt001` 0.0.13. The core's 0.0.12 is yanked:
