@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The MCP Inspector conformance job pins `@modelcontextprotocol/inspector`
   to 2.10.1, so a new npm publish cannot change what CI runs.
 
+### Changed
+
+- `requirements/ci.in` floors `tomli >= 2.5.0` on Python 3.10, and
+  `requirements/sbom.txt` moves tomli 2.4.1 to 2.5.0, in place of
+  Dependabot #58, whose recompile dropped the universal markers and left
+  libcst's `pyyaml-ft` unpinned on Python 3.13.
+
 ## [0.0.13] - 2026-10-23
 
 Ships in lockstep with `acmt001` 0.0.13. The core's 0.0.12 is yanked:
