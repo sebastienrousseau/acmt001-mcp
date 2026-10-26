@@ -26,10 +26,13 @@ server = pytest.importorskip("acmt001_mcp.server")
 def test_year_out_of_range_is_an_error(sample_record):
     """A year the XSD date types cannot hold is an error payload, not a raise.
 
-    The schema check raises OverflowError for it (found by fuzz/fuzz_tools.py).
+    acmt001 up to 0.0.13 lets the schema check's OverflowError escape (found
+    by fuzz/fuzz_tools.py), which the server reports as "year overflow"; a
+    later core reports it as a document that failed validation.
     """
     record = dict(
         sample_record, creation_date_time="222222222026-01-15T10:30:00"
     )
     payload = json.loads(server.generate_message("acmt.007.001.05", [record]))
-    assert "year overflow" in payload["error"]
+    error = payload["error"]
+    assert "year overflow" in error or "failed validation" in error, error
