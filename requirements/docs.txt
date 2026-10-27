@@ -1256,9 +1256,9 @@ mando==0.7.1 \
     --hash=sha256:18baa999b4b613faefb00eac4efadcf14f510b59b924b66e08289aa1de8c3500 \
     --hash=sha256:26ef1d70928b6057ee3ca12583d73c63e05c49de8972d620c278a7b206581a8a
     # via radon
-markdown-it-py==3.0.0 \
-    --hash=sha256:355216845c60bd96232cd8d8c40e8f9765cc86f46880e43a8fd22dc1a1a8cab1 \
-    --hash=sha256:e3f60a94fa066dc52ec76661e37c851cb232d92f9886b15cb560aaada2df8feb
+markdown-it-py==4.2.0 \
+    --hash=sha256:04a21681d6fbb623de53f6f364d352309d4094dd4194040a10fd51833e418d49 \
+    --hash=sha256:9f7ebbcd14fe59494226453aed97c1070d83f8d24b6fc3a3bcf9a38092641c4a
     # via
     #   mdit-py-plugins
     #   myst-parser
@@ -1501,9 +1501,9 @@ mypy-extensions==1.1.0 \
     # via
     #   black
     #   mypy
-myst-parser==4.0.1 \
-    --hash=sha256:5cfea715e4f3574138aecbf7d54132296bfd72bb614d31168f48c477a830a7c4 \
-    --hash=sha256:9134e88959ec3b5780aedf8a99680ea242869d012e8821db3126d427edc9c95d
+myst-parser==5.1.0 \
+    --hash=sha256:9c91c52b3cdb4d94a6506e4fab4e2f296c7623a0da0dcbe6de1565c3dad67a8a \
+    --hash=sha256:ab69322dc6719dcc7f296479dbb70181b66df6ed315064f92dbc85c0e1bf2f02
     # via -r requirements/docs.in
 opentelemetry-api==1.45.1 \
     --hash=sha256:aa38ed19bcc084ba42782a73255b3582283eced7ad6dddbd6695189e69adfb75 \
