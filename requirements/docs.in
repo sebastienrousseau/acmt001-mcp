@@ -9,7 +9,7 @@
 -r ci.in
 sphinx>=7,<9
 furo>=2024.1
-myst-parser[linkify]>=3,<5
+myst-parser[linkify]>=5.1.0,<6
 sphinx-autodoc-typehints>=2,<4
 sphinx-copybutton>=0.5,<1
 sphinxcontrib-mermaid>=0.9,<2
