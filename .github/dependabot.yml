@@ -1,7 +1,20 @@
 version: 2
 updates:
+  # Dependabot resolves a pip job on one Python: for "/" the lowest that
+  # pyproject.toml allows (3.10). The requirement sets compiled for a
+  # newer Python (build, docs and fuzz for 3.12, docker for 3.14) do not
+  # resolve there (build.in floors filelock at 4.2.1, which needs 3.11),
+  # so updating them from "/" failed with dependency_file_not_resolvable
+  # and turned the run red. "/" leaves them out; the second pip entry
+  # updates them from /requirements, where no pyproject.toml pins the
+  # Python and Dependabot uses its newest.
   - package-ecosystem: "pip"
     directory: "/"
+    exclude-paths:
+      - "requirements/build.*"
+      - "requirements/docker.*"
+      - "requirements/docs.*"
+      - "requirements/fuzz.*"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -22,6 +35,26 @@ updates:
       # acmt001 is hand-bumped in lockstep with the suite; Dependabot
       # would otherwise propose patch bumps that don't align with our
       # version-for-version release policy.
+      - dependency-name: "acmt001"
+
+  # The sets compiled for Python 3.12 and 3.14; ci and sbom stay with "/".
+  - package-ecosystem: "pip"
+    directory: "/requirements"
+    exclude-paths:
+      - "requirements/ci.*"
+      - "requirements/sbom.*"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "chore(deps):"
+      include: "scope"
+    ignore:
       - dependency-name: "acmt001"
 
   - package-ecosystem: "github-actions"

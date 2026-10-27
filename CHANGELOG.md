@@ -20,6 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Dependabot's weekly pip run no longer fails. It resolves the "/" job
+  on Python 3.10, the floor in `pyproject.toml`, where
+  `requirements/build.in` cannot resolve (`filelock >= 4.2.1` needs
+  3.11) and the docs group's Sphinx >= 8.2.3 does not exist, so the
+  dulwich and sphinx updates ended in `dependency_file_not_resolvable`
+  and "version solving failed". "/" now leaves the sets compiled for
+  3.12 and 3.14 (build, docker, docs, fuzz) to a second pip entry for
+  `/requirements`, which runs on Dependabot's newest Python; the docs
+  group in `pyproject.toml` is scoped to Python 3.12, the Python the
+  manual is built on; and `ci.in` spells its tomli marker
+  `python_full_version`, so Dependabot does not read it as a "Python
+  below 3.11" requirement for the `/requirements` job (`ci.txt` is
+  unchanged).
 - `requirements/ci.in` floors `tomli >= 2.5.0` on Python 3.10, and
   `requirements/sbom.txt` moves tomli 2.4.1 to 2.5.0, in place of
   Dependabot #58, whose recompile dropped the universal markers and left
