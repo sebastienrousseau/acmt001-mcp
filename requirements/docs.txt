@@ -1031,6 +1031,7 @@ jinja2==3.1.6 \
     #   acmt001
     #   myst-parser
     #   sphinx
+    #   sphinxcontrib-mermaid
 jsonschema==4.24.1 \
     --hash=sha256:6b916866aa0b61437785f1277aa2cbd63512e8d4b47151072ef13292049b4627 \
     --hash=sha256:fe45a130cc7f67cd0d67640b4e7e3e2e666919462ae355eda238296eafeb4b5d
@@ -2283,9 +2284,9 @@ sphinxcontrib-jsmath==2.0.0 \
     --hash=sha256:15ca92fe0eec82f0baf91a7efcc51ffacdb605924be6327683a52ebdacb6744c \
     --hash=sha256:551f780cf9687f9c3c74f0cf9f18aca06e0d6958853453f3803fe4d357c5b924
     # via sphinx
-sphinxcontrib-mermaid==1.2.3 \
-    --hash=sha256:358699d0ec924ef679b41873d9edd97d0773446daf9760c75e18dc0adfd91371 \
-    --hash=sha256:5be782b27026bef97bfb15ccb2f7868b674a1afc0982b54cb149702cfc25aa02
+sphinxcontrib-mermaid==2.1.1 \
+    --hash=sha256:3b9ac1a8e0b5154dec3c0acf9b5c54dd9ba58540e416f20858c300814c25648f \
+    --hash=sha256:f8d7f1b2f0ad69b7ebdd5cbf532fb4ee107893b5373bc2d0e9634089c0b2cfee
     # via -r requirements/docs.in
 sphinxcontrib-qthelp==2.0.0 \
     --hash=sha256:4fe7d0ac8fc171045be623aba3e2a8f613f8682731f9153bb2e40ece16b9bbab \

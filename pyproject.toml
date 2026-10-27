@@ -73,7 +73,7 @@ furo = { version = ">=2024.1", python = ">=3.12" }
 myst-parser = { version = ">=3,<6", extras = ["linkify"], python = ">=3.12" }
 sphinx-autodoc-typehints = { version = ">=2,<4", python = ">=3.12" }
 sphinx-copybutton = { version = ">=0.5,<1", python = ">=3.12" }
-sphinxcontrib-mermaid = { version = ">=0.9,<2", python = ">=3.12" }
+sphinxcontrib-mermaid = { version = ">=0.9,<3", python = ">=3.12" }
 
 [tool.poetry.urls]
 Documentation = "https://sebastienrousseau.github.io/acmt001-mcp/"
