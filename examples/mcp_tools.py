@@ -2,7 +2,7 @@
 """Example: call the acmt001-mcp server's tools in-process.
 
 Usage:
-    pip install acmt001-mcp     # requires Python 3.10+
+    pip install acmt001-mcp     # requires Python 3.11+
     python examples/mcp_tools.py
 
 The acmt001 MCP server (launched as ``acmt001-mcp`` over stdio) exposes the

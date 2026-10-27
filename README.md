@@ -11,7 +11,7 @@
   <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/acmt001-mcp"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/acmt001-mcp?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" height="28" /></a>
   <a href="https://www.bestpractices.dev/projects/15827"><img src="https://img.shields.io/cii/level/15827?style=for-the-badge&label=OpenSSF%20Best%20Practices&logo=openssf" alt="OpenSSF Best Practices" height="28" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg?style=for-the-badge" alt="License: Apache-2.0 OR MIT" height="28" /></a>
-  <a href="https://github.com/sebastienrousseau/acmt001-mcp/blob/main/docs/POLICIES.md"><img src="https://img.shields.io/badge/Python-3.10%2B-93450a.svg?style=for-the-badge&logo=python" alt="Python 3.10 or newer" height="28" /></a>
+  <a href="https://github.com/sebastienrousseau/acmt001-mcp/blob/main/docs/POLICIES.md"><img src="https://img.shields.io/badge/Python-3.11%2B-93450a.svg?style=for-the-badge&logo=python" alt="Python 3.11 or newer" height="28" /></a>
   <a href="https://glama.ai/mcp/servers/sebastienrousseau/acmt001-mcp"><img src="https://img.shields.io/badge/Glama-MCP%20server-6c5ce7?style=for-the-badge" alt="Glama MCP server listing" height="28" /></a>
 </p>
 
@@ -21,7 +21,7 @@ discover message types, inspect input schemas, validate records and financial
 identifiers, and generate validated XML, all from your favourite MCP client.
 
 > **Latest release: v0.0.13**: 7 MCP tools over stdio, streamable HTTP or
-> SSE, all backed by the shared `acmt001.services` layer, for Python 3.10+.
+> SSE, all backed by the shared `acmt001.services` layer, for Python 3.11+.
 > Ships in lockstep with `acmt001` 0.0.13; every CI and image install is
 > hash-pinned, and the tools are fuzzed. [See what's new →][release-0013]
 
@@ -82,7 +82,7 @@ flowchart LR
 
 ## Install
 
-**acmt001-mcp** runs on macOS, Linux, and Windows and requires **Python 3.10+**
+**acmt001-mcp** runs on macOS, Linux, and Windows and requires **Python 3.11+**
 and **pip**. It pulls in the core `acmt001` library and the MCP SDK
 automatically.
 

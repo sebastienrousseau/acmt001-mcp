@@ -18,10 +18,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The MCP Inspector conformance job pins `@modelcontextprotocol/inspector`
   to 2.10.1, so a new npm publish cannot change what CI runs.
 
+### Removed
+
+- **Python 3.10 is no longer supported; the floor is 3.11.** The test
+  toolchain stopped resolving there: Hypothesis 6.170.12 requires
+  Python 3.11, and `hypothesis = ">=6.100,<7"` against
+  `python = ">=3.10,<4.0"` made Dependabot's "/" pip job fail with
+  `HelperSubprocessFailed` while processing hypothesis
+  ([run 40480169269](https://github.com/sebastienrousseau/acmt001-mcp/actions/runs/40480169269)).
+  `pyproject.toml` now declares `python = ">=3.11,<4.0"` (and the
+  classifiers Poetry derives from it), ruff, black and mypy target
+  3.11, the CI test matrix runs 3.11 to 3.14, `requirements/ci.txt`
+  and `requirements/sbom.txt` are compiled for 3.11 without the 3.10
+  forks, the `tomli` backport is gone from `requirements/ci.in`, and
+  `scripts/check_suite_consistency.py` imports the stdlib `tomllib`
+  directly. The `acmt001` core library still declares 3.10, so this
+  server's floor now sits one minor above it.
+
 ### Changed
 
-- Dependabot's weekly pip run no longer fails. It resolves the "/" job
-  on Python 3.10, the floor in `pyproject.toml`, where
+- The weekly Dependabot pip run no longer fails on the sets compiled
+  for newer Pythons. (An earlier version of this entry said the whole
+  run no longer failed; it still did, on hypothesis, until the floor
+  moved to 3.11 above.) It resolved the "/" job
+  on Python 3.10, the floor in `pyproject.toml` at the time, where
   `requirements/build.in` cannot resolve (`filelock >= 4.2.1` needs
   3.11) and the docs group's Sphinx >= 8.2.3 does not exist, so the
   dulwich and sphinx updates ended in `dependency_file_not_resolvable`
@@ -36,7 +56,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `requirements/ci.in` floors `tomli >= 2.5.0` on Python 3.10, and
   `requirements/sbom.txt` moves tomli 2.4.1 to 2.5.0, in place of
   Dependabot #58, whose recompile dropped the universal markers and left
-  libcst's `pyyaml-ft` unpinned on Python 3.13.
+  libcst's `pyyaml-ft` unpinned on Python 3.13. (Both tomli pins went
+  with the 3.10 floor; see Removed.)
 
 ## [0.0.13] - 2026-10-23
 

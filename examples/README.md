@@ -15,7 +15,7 @@ The examples import directly from `acmt001_mcp.server`, so install this package
 (and the core `acmt001` library it depends on) first:
 
 ```sh
-pip install acmt001-mcp   # Python 3.10+
+pip install acmt001-mcp   # Python 3.11+
 ```
 
 > While the core `acmt001` library is not yet on PyPI, install it from source
