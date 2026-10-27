@@ -58,6 +58,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Dependabot #58, whose recompile dropped the universal markers and left
   libcst's `pyyaml-ft` unpinned on Python 3.13. (Both tomli pins went
   with the 3.10 floor; see Removed.)
+- Dependency updates, folded in from Dependabot #61 to #67 and
+  recompiled with each set's documented `uv pip compile` command so the
+  universal markers stay: hypothesis 6.170.12 (ci, docs, fuzz),
+  certifi 2026.10.23 (every hash-pinned set; the PYSEC-2026-4320 floor
+  stays at 2026.10.19), dulwich 1.2.20 (build), myst-parser 5.1.0 with
+  markdown-it-py 4.2.0 and sphinxcontrib-mermaid 2.1.1 (docs). The
+  pyproject docs group now allows myst-parser < 6 and
+  sphinxcontrib-mermaid < 3.
 
 ## [0.0.13] - 2026-10-23
 
