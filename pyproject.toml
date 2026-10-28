@@ -68,7 +68,7 @@ optional = true
 # scoped to 3.12+. Unscoped, it had to resolve for the then 3.10
 # floor, where no Sphinx >= 8.2.3 exists, and Dependabot's update of it
 # failed with "version solving failed".
-sphinx = { version = ">=7,<9", python = ">=3.12" }
+sphinx = { version = ">=7,<10", python = ">=3.12" }
 furo = { version = ">=2024.1", python = ">=3.12" }
 myst-parser = { version = ">=3,<6", extras = ["linkify"], python = ">=3.12" }
 sphinx-autodoc-typehints = { version = ">=2,<4", python = ">=3.12" }
