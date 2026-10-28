@@ -4,9 +4,9 @@ accessible-pygments==0.0.5 \
     --hash=sha256:40918d3e6a2b619ad424cb91e556bd3bd8865443d9f22f1dcdf79e33c8046872 \
     --hash=sha256:88ae3211e68a1d0b011504b2ffc1691feafce124b845bd072ab6f9f66f34d4b7
     # via furo
-acmt001==0.0.13 \
-    --hash=sha256:cba96b043b729f631bcbc39f30ab32cc594e1e95581d7b5118ce0a7b32ed0716 \
-    --hash=sha256:d0939c7869527ba704f88639914d62042c75a29f887bd56409dcb4b5e4337cda
+acmt001==0.0.14 \
+    --hash=sha256:7e8eb10b71c2dd686fa2da06a0e4da0339e77153362104abfdb9bb7bdebac131 \
+    --hash=sha256:c9dbf76aeae28f8339be6fea7092ffa19c44ccac6f4d2d16845f784957600842
     # via -r requirements/ci.in
 alabaster==1.0.0 \
     --hash=sha256:c00dca57bca26fa62a6d7d0a9fcce65f3e026e9bfe33e9c538fd3fbb2144fd9e \

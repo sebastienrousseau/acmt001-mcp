@@ -7,8 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.14] - 2026-10-27
+
+Ships in lockstep with `acmt001` 0.0.14, and the suite moves to
+Python 3.11 together.
+
 ### Security
 
+- **`acmt001` is floored at `>=0.0.14,<1`**, the core release this one
+  ships with, in `pyproject.toml`, `requirements/ci.in` and
+  `requirements/docker.in`; `ci.txt`, `docker.txt`, `docs.txt` and
+  `fuzz.txt` pin it at 0.0.14. That core reports a year the XSD date
+  types cannot hold as a document that failed validation, instead of
+  letting `OverflowError` escape.
 - The release SBOMs (CycloneDX and the pip-licenses manifest) describe
   the shipped runtime set: the hash-pinned `requirements/docker.txt` the
   image installs, plus the package as a local wheel, in a venv of their
@@ -32,8 +43,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `requirements/sbom.txt` are compiled for 3.11 without the 3.10
   forks, the `tomli` backport is gone from `requirements/ci.in`, and
   `scripts/check_suite_consistency.py` imports the stdlib `tomllib`
-  directly. The `acmt001` core library still declares 3.10, so this
-  server's floor now sits one minor above it.
+  directly. The `acmt001` core moves to 3.11 in 0.0.14, so the suite
+  shares one floor.
 
 ### Changed
 

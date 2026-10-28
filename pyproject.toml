@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "acmt001-mcp"
-version = "0.0.13"
+version = "0.0.14"
 description = "Model Context Protocol (MCP) server exposing the acmt001 ISO 20022 Account Management library as agent tools."
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 license = "Apache-2.0 OR MIT"
@@ -19,7 +19,7 @@ python = ">=3.11,<4.0"
 # The suite releases in lockstep: this server ships against the core
 # at its own version. (0.0.2 and 0.0.3 also capped cryptography<50.0.0,
 # which the floor below rules out.)
-acmt001 = ">=0.0.13,<1"
+acmt001 = ">=0.0.14,<1"
 # mcp < 1.30.0 and 2.0.x/2.1.x are affected by GHSA-84m7-p3x7-pcfv
 # (unbounded streamable HTTP session accumulation; this server serves
 # streamable HTTP), so no affected release can resolve.
