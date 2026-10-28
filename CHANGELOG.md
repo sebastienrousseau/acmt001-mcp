@@ -7,8 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.14] - 2026-10-27
+
+Ships in lockstep with `acmt001` 0.0.14, and the suite moves to
+Python 3.11 together.
+
 ### Security
 
+- **`acmt001` is floored at `>=0.0.14,<1`**, the core release this one
+  ships with, in `pyproject.toml`, `requirements/ci.in` and
+  `requirements/docker.in`; `ci.txt`, `docker.txt`, `docs.txt` and
+  `fuzz.txt` pin it at 0.0.14. That core reports a year the XSD date
+  types cannot hold as a document that failed validation, instead of
+  letting `OverflowError` escape.
 - The release SBOMs (CycloneDX and the pip-licenses manifest) describe
   the shipped runtime set: the hash-pinned `requirements/docker.txt` the
   image installs, plus the package as a local wheel, in a venv of their
@@ -18,10 +29,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The MCP Inspector conformance job pins `@modelcontextprotocol/inspector`
   to 2.10.1, so a new npm publish cannot change what CI runs.
 
+### Removed
+
+- **Python 3.10 is no longer supported; the floor is 3.11.** The test
+  toolchain stopped resolving there: Hypothesis 6.170.12 requires
+  Python 3.11, and `hypothesis = ">=6.100,<7"` against
+  `python = ">=3.10,<4.0"` made Dependabot's "/" pip job fail with
+  `HelperSubprocessFailed` while processing hypothesis
+  ([run 40480169269](https://github.com/sebastienrousseau/acmt001-mcp/actions/runs/40480169269)).
+  `pyproject.toml` now declares `python = ">=3.11,<4.0"` (and the
+  classifiers Poetry derives from it), ruff, black and mypy target
+  3.11, the CI test matrix runs 3.11 to 3.14, `requirements/ci.txt`
+  and `requirements/sbom.txt` are compiled for 3.11 without the 3.10
+  forks, the `tomli` backport is gone from `requirements/ci.in`, and
+  `scripts/check_suite_consistency.py` imports the stdlib `tomllib`
+  directly. The `acmt001` core moves to 3.11 in 0.0.14, so the suite
+  shares one floor.
+
 ### Changed
 
-- Dependabot's weekly pip run no longer fails. It resolves the "/" job
-  on Python 3.10, the floor in `pyproject.toml`, where
+- The weekly Dependabot pip run no longer fails on the sets compiled
+  for newer Pythons. (An earlier version of this entry said the whole
+  run no longer failed; it still did, on hypothesis, until the floor
+  moved to 3.11 above.) It resolved the "/" job
+  on Python 3.10, the floor in `pyproject.toml` at the time, where
   `requirements/build.in` cannot resolve (`filelock >= 4.2.1` needs
   3.11) and the docs group's Sphinx >= 8.2.3 does not exist, so the
   dulwich and sphinx updates ended in `dependency_file_not_resolvable`
@@ -36,7 +67,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `requirements/ci.in` floors `tomli >= 2.5.0` on Python 3.10, and
   `requirements/sbom.txt` moves tomli 2.4.1 to 2.5.0, in place of
   Dependabot #58, whose recompile dropped the universal markers and left
-  libcst's `pyyaml-ft` unpinned on Python 3.13.
+  libcst's `pyyaml-ft` unpinned on Python 3.13. (Both tomli pins went
+  with the 3.10 floor; see Removed.)
+- Dependency updates, folded in from Dependabot #61 to #67 and
+  recompiled with each set's documented `uv pip compile` command so the
+  universal markers stay: hypothesis 6.170.12 (ci, docs, fuzz),
+  certifi 2026.10.23 (every hash-pinned set; the PYSEC-2026-4320 floor
+  stays at 2026.10.19), dulwich 1.2.20 (build), myst-parser 5.1.0 with
+  markdown-it-py 4.2.0 and sphinxcontrib-mermaid 2.1.1 (docs). The
+  pyproject docs group now allows myst-parser < 6 and
+  sphinxcontrib-mermaid < 3.
 
 ## [0.0.13] - 2026-10-23
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "acmt001-mcp"
-version = "0.0.13"
+version = "0.0.14"
 description = "Model Context Protocol (MCP) server exposing the acmt001 ISO 20022 Account Management library as agent tools."
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 license = "Apache-2.0 OR MIT"
@@ -15,11 +15,11 @@ packages = [
 acmt001-mcp = "acmt001_mcp.server:main"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4.0"
+python = ">=3.11,<4.0"
 # The suite releases in lockstep: this server ships against the core
 # at its own version. (0.0.2 and 0.0.3 also capped cryptography<50.0.0,
 # which the floor below rules out.)
-acmt001 = ">=0.0.13,<1"
+acmt001 = ">=0.0.14,<1"
 # mcp < 1.30.0 and 2.0.x/2.1.x are affected by GHSA-84m7-p3x7-pcfv
 # (unbounded streamable HTTP session accumulation; this server serves
 # streamable HTTP), so no affected release can resolve.
@@ -65,15 +65,15 @@ optional = true
 [tool.poetry.group.docs.dependencies]
 # The manual is built on Python 3.12 (docs.yml, requirements/docs.txt),
 # and the current Sphinx line needs 3.11 or newer, so the group is
-# scoped to 3.12+. Unscoped, it had to resolve for the project's 3.10
+# scoped to 3.12+. Unscoped, it had to resolve for the then 3.10
 # floor, where no Sphinx >= 8.2.3 exists, and Dependabot's update of it
 # failed with "version solving failed".
 sphinx = { version = ">=7,<9", python = ">=3.12" }
 furo = { version = ">=2024.1", python = ">=3.12" }
-myst-parser = { version = ">=3,<5", extras = ["linkify"], python = ">=3.12" }
+myst-parser = { version = ">=3,<6", extras = ["linkify"], python = ">=3.12" }
 sphinx-autodoc-typehints = { version = ">=2,<4", python = ">=3.12" }
 sphinx-copybutton = { version = ">=0.5,<1", python = ">=3.12" }
-sphinxcontrib-mermaid = { version = ">=0.9,<2", python = ">=3.12" }
+sphinxcontrib-mermaid = { version = ">=0.9,<3", python = ">=3.12" }
 
 [tool.poetry.urls]
 Documentation = "https://sebastienrousseau.github.io/acmt001-mcp/"
@@ -123,7 +123,7 @@ pytest_add_cli_args_test_selection = [
 # so reformatting it would invalidate the check it exists to make.
 extend-exclude = "tests/test_suite_conformance\\.py"
 line-length = 79
-target-version = ['py310']
+target-version = ['py311']
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -156,7 +156,7 @@ skip_covered = false
 
 [tool.ruff]
 line-length = 79
-target-version = "py310"
+target-version = "py311"
 extend-exclude = ["*.md", "tmp_env", ".venv", ".eggs"]
 
 [tool.ruff.lint]
@@ -170,6 +170,12 @@ ignore = ["E501"]
 "benches/*.py" = ["E402"]
 "__init__.py" = ["F401"]
 "tests/conftest.py" = ["E402"]
+# The vendored suite conformance file is byte-pinned to its canonical
+# copy (black excludes it above for the same reason) and keeps a tomli
+# fallback for the suite's 3.10 floor; with this repository on 3.11 that
+# branch is dead, and the fix belongs in the canonical copy, not here.
+# structured-address-fix (floor 3.12) carries the same ignore.
+"tests/test_suite_conformance.py" = ["UP036"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -177,7 +183,7 @@ indent-style = "space"
 skip-magic-trailing-comma = false
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 strict = true
 warn_return_any = true
 warn_unused_configs = true

@@ -53,7 +53,7 @@ validate before it generates, and never ship an invalid file.
 ## Install
 
 ```sh
-pip install acmt001-mcp             # Python 3.10+
+pip install acmt001-mcp             # Python 3.11+
 pip install "acmt001-mcp[online]"   # adds httpx for verify_lei_online
 ```
 
