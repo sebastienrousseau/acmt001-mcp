@@ -8,7 +8,7 @@
 # Regenerate (the image's Python, every Linux architecture):
 #   uv pip compile --generate-hashes --universal --python-version 3.14 \
 #     requirements/docker.in -o requirements/docker.txt
-acmt001>=0.0.14,<1
+acmt001>=0.0.15,<1
 # Build backend for `pip install --no-deps --no-build-isolation .` in the
 # image, pinned by hash here instead of fetched unpinned at build time.
 poetry-core
