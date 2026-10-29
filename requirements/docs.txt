@@ -4,9 +4,9 @@ accessible-pygments==0.0.5 \
     --hash=sha256:40918d3e6a2b619ad424cb91e556bd3bd8865443d9f22f1dcdf79e33c8046872 \
     --hash=sha256:88ae3211e68a1d0b011504b2ffc1691feafce124b845bd072ab6f9f66f34d4b7
     # via furo
-acmt001==0.0.14 \
-    --hash=sha256:7e8eb10b71c2dd686fa2da06a0e4da0339e77153362104abfdb9bb7bdebac131 \
-    --hash=sha256:c9dbf76aeae28f8339be6fea7092ffa19c44ccac6f4d2d16845f784957600842
+acmt001==0.0.15 \
+    --hash=sha256:12f684a46d9df91731ea0f3d85ed30038863244528654107a3cadc4c46c47534 \
+    --hash=sha256:a1273c8ccf4abc3d8b50ca5a615c16a368d7713372259c8f40190c826f1824e7
     # via -r requirements/ci.in
 alabaster==1.0.0 \
     --hash=sha256:c00dca57bca26fa62a6d7d0a9fcce65f3e026e9bfe33e9c538fd3fbb2144fd9e \
@@ -1970,10 +1970,6 @@ rich==15.0.0 \
 roman-numerals==4.1.0 \
     --hash=sha256:1af8b147eb1405d5839e78aeb93131690495fe9da5c91856cb33ad55a7f1e5b2 \
     --hash=sha256:647ba99caddc2cc1e55a51e4360689115551bf4476d90e8162cf8c345fe233c7
-    # via roman-numerals-py
-roman-numerals-py==4.1.0 \
-    --hash=sha256:553114c1167141c1283a51743759723ecd05604a1b6b507225e91dc1a6df0780 \
-    --hash=sha256:f5d7b2b4ca52dd855ef7ab8eb3590f428c0b1ea480736ce32b01fef2a5f8daf9
     # via sphinx
 rpds-py==2026.9.1 \
     --hash=sha256:00ba2d8c7dd4ee537978ddf4b3fbd712bef2d8751603f7f3146b3f4287768e25 \
@@ -2245,9 +2241,9 @@ soupsieve==3.0.4 \
     --hash=sha256:8412826614f9c632227067d0985aeb9f584bd15efc852955430e097a9fe7afbf \
     --hash=sha256:924fab84ae21604c19e175e1f39815eb6fa83ba23836e09e9de180925e5bc4c0
     # via beautifulsoup4
-sphinx==8.2.3 \
-    --hash=sha256:398ad29dee7f63a75888314e9424d40f52ce5a6a87ae88e7071e80af296ec348 \
-    --hash=sha256:4405915165f13521d875a8c29c8970800a0141c14cc5416a38feca4ea5d9b9c3
+sphinx==9.1.1 ; python_full_version < '3.13' \
+    --hash=sha256:48b627f02908f22c601b3ba9c7b17265b4f315dd05c8bc64cd4da41183f44fbc \
+    --hash=sha256:f8b60013ce25017be41a509e5c2d265bc1918410061315c36b809c7f335646c0
     # via
     #   -r requirements/docs.in
     #   furo
@@ -2256,9 +2252,20 @@ sphinx==8.2.3 \
     #   sphinx-basic-ng
     #   sphinx-copybutton
     #   sphinxcontrib-mermaid
-sphinx-autodoc-typehints==3.5.2 \
-    --hash=sha256:0accd043619f53c86705958e323b419e41667917045ac9215d7be1b493648d8c \
-    --hash=sha256:5fcd4a3eb7aa89424c1e2e32bedca66edc38367569c9169a80f4b3e934171fdb
+sphinx==9.2.0 ; python_full_version >= '3.13' \
+    --hash=sha256:4c3ec13b612712c0d3ce4cbdd9e3eb91e68577e07a8e31f32f21cf178453578c \
+    --hash=sha256:90470459f3cab15d9dfed146c71cf77694b0445df17b2e0e69059cb9f7fc9ee4
+    # via
+    #   -r requirements/docs.in
+    #   furo
+    #   myst-parser
+    #   sphinx-autodoc-typehints
+    #   sphinx-basic-ng
+    #   sphinx-copybutton
+    #   sphinxcontrib-mermaid
+sphinx-autodoc-typehints==3.17.4 \
+    --hash=sha256:251271a49e46573c2e752bcc92dae232def822a2c9983272cb04d282eadc2bfa \
+    --hash=sha256:a5ddd545192380292f13dd9fc232717a0925fbc66617bc51b3db1e0480db0fec
     # via -r requirements/docs.in
 sphinx-basic-ng==1.0.0b2 \
     --hash=sha256:9ec55a47c90c8c002b5960c57492ec3021f5193cb26cebc2dc4ea226848651c9 \
@@ -2336,6 +2343,7 @@ typing-extensions==4.16.0 \
     #   pydantic
     #   pydantic-core
     #   referencing
+    #   sphinx-autodoc-typehints
     #   starlette
     #   textual
     #   typing-inspection
