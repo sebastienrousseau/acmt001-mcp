@@ -7,7 +7,7 @@
 #   uv pip compile --generate-hashes --universal --python-version 3.12 \
 #     requirements/docs.in -o requirements/docs.txt
 -r ci.in
-sphinx>=7,<9
+sphinx>=7,<10
 furo>=2024.1
 myst-parser[linkify]>=3,<6
 sphinx-autodoc-typehints>=2,<4
