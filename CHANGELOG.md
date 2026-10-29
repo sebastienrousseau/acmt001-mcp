@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.15] - 2026-10-29
+
+Ships in lockstep with `acmt001` 0.0.15, after the core; the suite's
+manuals move to Sphinx 9. The MCP tools are unchanged.
+
+### Changed
+
+- The docs toolchain allows Sphinx 9 (`sphinx = ">=7,<10"` in the
+  poetry `docs` group and `requirements/docs.in`, #69, #70).
+  `requirements/docs.txt` is recompiled in place for the Python 3.12 docs
+  job: Sphinx 9.1.1 there (9.2.0 needs Python 3.13), and
+  `sphinx-autodoc-typehints` 3.17.4, the version `poetry.lock` holds.
+- Requires `acmt001 >= 0.0.15, < 1` in `pyproject.toml`,
+  `requirements/ci.in` and `docker.in`, and the hash-pinned requirement
+  files pin the published acmt001 0.0.15.
+
 ## [0.0.14] - 2026-10-27
 
 Ships in lockstep with `acmt001` 0.0.14, and the suite moves to
