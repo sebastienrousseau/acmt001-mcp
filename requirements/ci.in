@@ -38,4 +38,4 @@ mypy>=1.11,<3.0
 interrogate>=1.7.0
 mutmut>=3.7,<4
 radon>=6.0
-complexipy>=8.1
+complexipy>=8.3.0
