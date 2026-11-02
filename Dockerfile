@@ -6,7 +6,7 @@
 
 # The base image is pinned by digest (OpenSSF Scorecard Pinned-Dependencies);
 # Dependabot's docker ecosystem keeps the tag and digest current.
-FROM python:3.14-slim@sha256:0514bc76712d64f8bb48adcb95b1ab0d88c69fee95d62fe4c18ee948bee9b1e1 AS builder
+FROM python:3.15-slim@sha256:94d3426f1def7db4a106a232ac121bfd975393e5dfd40a619b955fae45fe7913 AS builder
 
 WORKDIR /build
 
@@ -32,7 +32,7 @@ RUN python -m venv /opt/venv \
     && rm -rf /tmp/wheel
 
 
-FROM python:3.14-slim@sha256:0514bc76712d64f8bb48adcb95b1ab0d88c69fee95d62fe4c18ee948bee9b1e1
+FROM python:3.15-slim@sha256:94d3426f1def7db4a106a232ac121bfd975393e5dfd40a619b955fae45fe7913
 
 LABEL org.opencontainers.image.title="acmt001-mcp" \
       org.opencontainers.image.description="Model Context Protocol server for the acmt001 ISO 20022 account-management library." \
