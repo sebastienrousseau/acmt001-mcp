@@ -36,6 +36,6 @@ ruff>=0.1,<0.18
 black>=26.3.1
 mypy>=1.11,<3.0
 interrogate>=1.7.0
-mutmut>=3.7,<4
+mutmut>=3.8.1,<4
 radon>=6.0
 complexipy>=8.1
