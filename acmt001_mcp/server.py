@@ -146,9 +146,9 @@ def list_message_types() -> list[dict]:
 
     Use this first, before any generation or validation call, to discover the
     exact ``message_type`` strings this server accepts (e.g.
-    ``acmt.001.001.08`` Account Opening Instruction). Do not use it to fetch a
-    type's fields or schema -- call ``get_required_fields`` or
-    ``get_input_schema`` for that.
+    ``acmt.001.001.08`` Account Opening Instruction). Returns message-type
+    codes and display names only; use ``get_required_fields`` or
+    ``get_input_schema`` to inspect fields or schemas.
 
     Returns a list of ``{"message_type": ..., "name": ...}`` dictionaries, one
     per supported message type (e.g. ``acmt.001.001.08``).
