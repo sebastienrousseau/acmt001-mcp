@@ -10,6 +10,6 @@
 sphinx>=7,<10
 furo>=2024.1
 myst-parser[linkify]>=3,<6
-sphinx-autodoc-typehints>=2,<4
+sphinx-autodoc-typehints>=3.17.5,<4
 sphinx-copybutton>=0.5,<1
 sphinxcontrib-mermaid>=0.9,<3
