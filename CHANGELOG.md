@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Reworded the cross-tool imperative in `list_message_types` into a declarative
+  scope boundary so every MCP tool description governs only its own tool and
+  clears `passmcp` `catalog.text.shadowing` checks.
+
+### Changed
+
+- CI and release workflows: `github/codeql-action` 4.39.3 and
+  `sigstore/cosign-installer` 4.1.3 (#91).
+- Dependency floors and universal hash-pinned requirement sets: `anyio` 4.16.0
+  (#93, #100), `ruff` 0.17.4 (#92, #97), `cyclonedx-bom` 8.0.1 (#94),
+  `filelock` 4.2.9 (#95), `dulwich` 1.2.21 (#96), `virtualenv` 21.15.5 (#98),
+  `sphinx-autodoc-typehints` 3.17.5 (#99), and `soupsieve` 4.0 (#101).
+
 ## [0.0.15] - 2026-10-29
 
 Ships in lockstep with `acmt001` 0.0.15, after the core; the suite's
