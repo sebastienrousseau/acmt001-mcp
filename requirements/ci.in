@@ -30,7 +30,7 @@ pytest>=9.2.0,<10.0.0
 pytest-cov>=6.0.0,<8.0.0
 packaging>=23.0
 respx>=0.21,<1
-hypothesis>=6.170.14,<7
+hypothesis>=6.170.15,<7
 # Lint, format, types, docstrings, mutation, complexity.
 ruff>=0.17.4,<0.18
 black>=26.3.1
